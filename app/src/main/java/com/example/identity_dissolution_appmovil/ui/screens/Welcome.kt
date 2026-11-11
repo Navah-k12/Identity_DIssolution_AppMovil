@@ -45,7 +45,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun Welcome(){
-    val familiFont =
+    val familiFont = 1
     var currentProgress by remember { mutableFloatStateOf(0f) }
     var loading by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
