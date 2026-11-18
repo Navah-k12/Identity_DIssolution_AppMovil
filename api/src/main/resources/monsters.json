@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "El Mudo",
+    "enemyClass": "Cazador silencioso",
+    "dangerLevel": "A",
+    "danger": 0.8,
+    "speed": 0.7,
+    "behavior": "No emite ningún sonido. Recorre los pasillos sin patrón fijo y, cuando te detecta, pasa directo a la caza: corre hacia ti y ataca con las manos sin avisar.",
+    "strategy": "Las descargas no lo detienen: el aturdidor y el Stunject no le hacen efecto. Vigila tu espalda en los pasillos en silencio y usa el revólver si está cerca.",
+    "folder": "Monsters/Monster1",
+    "image": "Monster1.jpg",
+    "model": "Monster1.glb",
+    "cinematic": "monster1.webp"
+  },
+  {
+    "id": 2,
+    "name": "La Boca",
+    "enemyClass": "Devorador",
+    "dangerLevel": "A",
+    "danger": 0.78,
+    "speed": 0.45,
+    "behavior": "Patrulla los pasillos y se detiene a devorar cadáveres. Cuando te detecta, grita para avisar a los demás y ataca con mordidas y golpes.",
+    "strategy": "Aprovecha cuando está comiendo para pasar a su lado sin ser visto. Si te ve, aturdirlo te da unos segundos para escapar.",
+    "folder": "Monsters/Monster2",
+    "image": "Monster2.jpg",
+    "model": "Monster2.glb",
+    "cinematic": "monster2.webp"
+  },
+  {
+    "id": 3,
+    "name": "El Alto",
+    "enemyClass": "Coloso",
+    "dangerLevel": "S",
+    "danger": 0.95,
+    "speed": 0.35,
+    "behavior": "Mide 2.5 metros. Sus brazos largos le dan un alcance enorme: lanza golpes largos con cualquiera de los dos brazos y puede agarrarte desde lejos.",
+    "strategy": "No dejes que te acorrale: su alcance es mayor del que parece. Es lento, así que mantén la distancia. El aturdidor lo detiene, aprovéchalo para huir.",
+    "folder": "Monsters/Monster3",
+    "image": "Monster3.jpg",
+    "model": "Monster3.glb",
+    "cinematic": "monster3.webp"
+  },
+  {
+    "id": 4,
+    "name": "El Rastreador",
+    "enemyClass": "Acechador",
+    "dangerLevel": "A",
+    "danger": 0.75,
+    "speed": 0.9,
+    "behavior": "Se mueve agachado y sigue tu rastro. Salta sobre su presa desde lejos, la muerde y se alimenta de los cuerpos que encuentra.",
+    "strategy": "Es el más rápido: correr en línea recta no sirve. Busca obstáculos que corten sus saltos y atúrdelo cuando caiga cerca de ti.",
+    "folder": "Monsters/Monster4",
+    "image": "Monster4.jpeg",
+    "model": "Monster4.glb",
+    "cinematic": "monster4.webp"
+  }
+]
