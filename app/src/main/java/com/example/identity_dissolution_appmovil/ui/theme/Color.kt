@@ -2,10 +2,12 @@ package com.example.identity_dissolution_appmovil.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Paleta "Heartbeat": fondo casi negro, rojo sangre como acento.
+val BloodRed = Color(0xFFE53935)
+val DarkRed = Color(0xFF8B0000)
+val Background = Color(0xFF0B0A0A)
+val Surface = Color(0xFF161112)
+val SurfaceHigh = Color(0xFF1F1718)
+val Border = Color(0xFF3A1C1E)
+val TextMain = Color(0xFFEDE4DC)
+val TextMuted = Color(0xFF9A8F88)
