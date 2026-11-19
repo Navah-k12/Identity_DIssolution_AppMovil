@@ -43,7 +43,7 @@ import java.nio.ByteBuffer
 
 /** Visor 3D: el usuario gira el modelo con un dedo y hace zoom con dos. */
 @Composable
-fun Model3DScreen(onBack: () -> Unit, viewModel: Model3DViewModel = viewModel()) {
+fun Model3DScreen(onBack: () -> Unit, onOpenAR: (Int) -> Unit, viewModel: Model3DViewModel = viewModel()) {
     val monster by viewModel.monster.collectAsState()
     val model by viewModel.model.collectAsState()
 
@@ -71,6 +71,11 @@ fun Model3DScreen(onBack: () -> Unit, viewModel: Model3DViewModel = viewModel())
                 }
                 is ModelState.Ready -> {
                     ModelViewer(m.buffer)
+                    Button(
+                        onClick = { monster?.let { onOpenAR(it.id) } },
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkRed, contentColor = Color.White),
+                        modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
+                    ) { Text("VER EN TU MUNDO (AR)") }
                     Text(
                         "Arrastra para girar • Pellizca para acercar",
                         color = TextMuted,

@@ -14,6 +14,7 @@ object Routes {
     const val ARTICLE = "article/{id}"
     const val BESTIARY = "bestiary"
     const val MODEL_3D = "model3d/{id}"
+    const val AR = "ar/{id}"
     const val CONTROLS = "controls"
     const val INVENTORY = "inventory"
     const val HISTORY = "history"
@@ -21,6 +22,7 @@ object Routes {
 
     fun article(id: Int) = "article/$id"
     fun model3d(id: Int) = "model3d/$id"
+    fun ar(id: Int) = "ar/$id"
 
     /** Bestiario con un monstruo a la vista (desde "Continuar lectura"). */
     const val BESTIARY_PATTERN = "bestiary?focus={focus}"

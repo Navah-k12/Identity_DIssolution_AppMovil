@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.identity_dissolution_appmovil.ui.screens.ARScreen
 import com.example.identity_dissolution_appmovil.ui.screens.ArticleDetailScreen
 import com.example.identity_dissolution_appmovil.ui.screens.BestiaryScreen
 import com.example.identity_dissolution_appmovil.ui.screens.ControlsScreen
@@ -92,7 +93,17 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 arguments = listOf(navArgument("id") { type = NavType.IntType }),
             ) {
                 // Model3DViewModel lee el "id" de la ruta con SavedStateHandle.
-                Model3DScreen(onBack = { navController.popBackStack() })
+                Model3DScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenAR = { navController.navigate(Routes.ar(it)) },
+                )
+            }
+            composable(
+                Routes.AR,
+                arguments = listOf(navArgument("id") { type = NavType.IntType }),
+            ) {
+                // Reutiliza Model3DViewModel: también lee el "id" de la ruta.
+                ARScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.CONTROLS) { ControlsScreen(onBack = { navController.popBackStack() }) }
             composable(Routes.HISTORY) { HistoryScreen(onBack = { navController.popBackStack() }) }

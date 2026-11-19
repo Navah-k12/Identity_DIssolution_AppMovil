@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.gif)
     implementation(libs.sceneview)
+    implementation(libs.arsceneview)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
