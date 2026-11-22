@@ -1,10 +1,10 @@
 package com.example.identity_dissolution_appmovil.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Work
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.ui.graphics.vector.ImageVector
 
 object Routes {
@@ -13,6 +13,7 @@ object Routes {
     const val ENCYCLOPEDIA = "encyclopedia"
     const val ARTICLE = "article/{id}"
     const val BESTIARY = "bestiary"
+    const val MONSTER = "monster/{id}"
     const val MODEL_3D = "model3d/{id}"
     const val AR = "ar/{id}"
     const val CONTROLS = "controls"
@@ -23,16 +24,14 @@ object Routes {
     fun article(id: Int) = "article/$id"
     fun model3d(id: Int) = "model3d/$id"
     fun ar(id: Int) = "ar/$id"
+    fun monster(id: Int) = "monster/$id"
 
-    /** Bestiario con un monstruo a la vista (desde "Continuar lectura"). */
-    const val BESTIARY_PATTERN = "bestiary?focus={focus}"
-    fun bestiary(focusId: Int) = "bestiary?focus=$focusId"
 }
 
 /** Pestañas de la barra inferior. */
 enum class BottomTab(val route: String, val label: String, val icon: ImageVector) {
-    HOME(Routes.HOME, "Inicio", Icons.Filled.Home),
-    GUIDE(Routes.ENCYCLOPEDIA, "Guía", Icons.AutoMirrored.Filled.MenuBook),
-    INVENTORY(Routes.INVENTORY, "Inv", Icons.Filled.Work),
-    SETTINGS(Routes.SETTINGS, "Ajustes", Icons.Filled.Settings),
+    HOME(Routes.HOME, "Inicio", Icons.Outlined.Home),
+    GUIDE(Routes.ENCYCLOPEDIA, "Guía", Icons.AutoMirrored.Outlined.MenuBook),
+    INVENTORY(Routes.INVENTORY, "Inventario", Icons.Outlined.WorkOutline),
+    SETTINGS(Routes.SETTINGS, "Ajustes", Icons.Outlined.Tune),
 }

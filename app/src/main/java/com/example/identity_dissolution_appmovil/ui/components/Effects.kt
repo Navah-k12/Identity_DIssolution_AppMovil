@@ -31,7 +31,7 @@ import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 /** Ajustes visuales disponibles en cualquier pantalla sin pasarlos por parámetro. */
-data class VisualEffects(val glitch: Boolean = false)
+data class VisualEffects(val glitch: Boolean = false, val intensity: Float = 0.6f)
 
 val LocalVisualEffects = compositionLocalOf { VisualEffects() }
 
@@ -59,15 +59,18 @@ fun GlitchText(
     color: Color = Color.Unspecified,
     textAlign: TextAlign? = null,
 ) {
-    val enabled = LocalVisualEffects.current.glitch
+    val effects = LocalVisualEffects.current
+    val enabled = effects.glitch && effects.intensity > 0f
+    // Con 100 % el texto se desplaza hasta 7 dp; con 10 % apenas 1 dp.
+    val maxShift = (effects.intensity * 7).toInt().coerceAtLeast(1)
     var shift by remember { mutableIntStateOf(0) }
 
     if (enabled) {
-        LaunchedEffect(text) {
+        LaunchedEffect(text, maxShift) {
             while (true) {
                 delay(Random.nextLong(1500, 4000))
                 repeat(4) {
-                    shift = Random.nextInt(-4, 5)
+                    shift = Random.nextInt(-maxShift, maxShift + 1)
                     delay(50)
                 }
                 shift = 0

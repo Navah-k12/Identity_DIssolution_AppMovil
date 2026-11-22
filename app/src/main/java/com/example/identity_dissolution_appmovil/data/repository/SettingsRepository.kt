@@ -5,6 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.identity_dissolution_appmovil.model.Settings
@@ -25,6 +27,8 @@ class SettingsRepository(context: Context) {
         val LANGUAGE = stringPreferencesKey("language")
         val AUTO_SYNC = booleanPreferencesKey("auto_sync")
         val PULSE = booleanPreferencesKey("pulse_notifications")
+        val INTENSITY = floatPreferencesKey("glitch_intensity")
+        val TEXT_SIZE = intPreferencesKey("text_size")
     }
 
     val settings: Flow<Settings> = store.data.map { p ->
@@ -35,6 +39,8 @@ class SettingsRepository(context: Context) {
             language = p[Keys.LANGUAGE] ?: d.language,
             autoSync = p[Keys.AUTO_SYNC] ?: d.autoSync,
             pulseNotifications = p[Keys.PULSE] ?: d.pulseNotifications,
+            glitchIntensity = p[Keys.INTENSITY] ?: d.glitchIntensity,
+            textSize = p[Keys.TEXT_SIZE] ?: d.textSize,
         )
     }
 
@@ -43,5 +49,7 @@ class SettingsRepository(context: Context) {
     suspend fun setLanguage(v: String) = store.edit { it[Keys.LANGUAGE] = v }
     suspend fun setAutoSync(v: Boolean) = store.edit { it[Keys.AUTO_SYNC] = v }
     suspend fun setPulse(v: Boolean) = store.edit { it[Keys.PULSE] = v }
+    suspend fun setGlitchIntensity(v: Float) = store.edit { it[Keys.INTENSITY] = v }
+    suspend fun setTextSize(v: Int) = store.edit { it[Keys.TEXT_SIZE] = v }
     suspend fun clear() = store.edit { it.clear() }
 }

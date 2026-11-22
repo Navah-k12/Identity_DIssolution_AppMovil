@@ -37,17 +37,33 @@ object GameRepository {
             "Es el más rápido: correr en línea recta no sirve. Busca obstáculos que corten sus saltos y atúrdelo cuando caiga cerca de ti."),
     )
 
+    /** Arte de cada monstruo (Descargas/App-videojuego/Bestiario), por id. */
+    val monsterArt = mapOf(
+        1 to R.drawable.monster_mudo,
+        2 to R.drawable.monster_boca,
+        3 to R.drawable.monster_alto,
+        4 to R.drawable.monster_rastreador,
+    )
+
+    /** Figura recortada (sin fondo) para invocar al monstruo en realidad aumentada. */
+    val monsterCutout = mapOf(
+        1 to R.drawable.summon_mudo,
+        2 to R.drawable.summon_boca,
+        3 to R.drawable.summon_alto,
+        4 to R.drawable.summon_rastreador,
+    )
+
     // Props del juego (Props/Props.blend). Usos tomados de Lukas_RH07.blend (sockets y animaciones).
     // Las imágenes son renders de esos modelos. Los props gore no van en la app.
     val inventory = listOf(
-        InventoryItem(1, "Llave maestra", "🗝️", 1, "Abre las puertas cerradas con llave. Lukas la usa al abrir una puerta.", R.drawable.prop_llave_maestra),
-        InventoryItem(2, "Autoinyector", "💉", 2, "Lukas se lo inyecta con la mano derecha para recuperar vida.", R.drawable.prop_autoinyector),
-        InventoryItem(3, "Aturdidor", "⚡", 1, "Arma cuerpo a cuerpo de la mano derecha. Aturde a los monstruos unos segundos. No funciona con El Mudo.", R.drawable.prop_aturdidor),
-        InventoryItem(4, "Stunject", "🧪", 1, "Inyección aturdidora. Deja quieto a un monstruo si logras acercarte. No funciona con El Mudo.", R.drawable.prop_stunject),
-        InventoryItem(5, "Munición", "📦", 12, "Balas para los revólveres. Se recargan bala a bala.", R.drawable.prop_municion),
-        InventoryItem(7, "Revólver", "🔫", 2, "Lukas lleva uno en cada mano. Su pantalla muestra las balas que quedan.", R.drawable.prop_revolver),
-        InventoryItem(8, "Tarjeta de acceso", "💳", 1, "Abre las puertas electrónicas y las zonas restringidas.", R.drawable.prop_tarjeta_acceso),
-        InventoryItem(9, "Terminal", "📟", 1, "Terminal de brazo. Lukas lo consulta para leer registros y abrir sistemas.", R.drawable.prop_terminal),
+        InventoryItem(1, "Llave maestra", "🗝️", 1, "Abre las puertas cerradas con llave. Lukas la usa al abrir una puerta.", R.drawable.prop_llave_maestra, "Herramienta"),
+        InventoryItem(2, "Autoinyector", "💉", 2, "Lukas se lo inyecta con la mano derecha para recuperar vida.", R.drawable.prop_autoinyector, "Médico"),
+        InventoryItem(3, "Aturdidor", "⚡", 1, "Arma cuerpo a cuerpo de la mano derecha. Aturde a los monstruos unos segundos. No funciona con El Mudo.", R.drawable.prop_aturdidor, "Arma"),
+        InventoryItem(4, "Stunject", "🧪", 1, "Inyección aturdidora. Deja quieto a un monstruo si logras acercarte. No funciona con El Mudo.", R.drawable.prop_stunject, "Arma"),
+        InventoryItem(5, "Munición", "📦", 12, "Balas para los revólveres. Se recargan bala a bala.", R.drawable.prop_municion, "Munición"),
+        InventoryItem(7, "Revólver", "🔫", 2, "Lukas lleva uno en cada mano. Su pantalla muestra las balas que quedan.", R.drawable.prop_revolver, "Arma"),
+        InventoryItem(8, "Tarjeta de acceso", "💳", 1, "Abre las puertas electrónicas y las zonas restringidas.", R.drawable.prop_tarjeta_acceso, "Acceso"),
+        InventoryItem(9, "Terminal", "📟", 1, "Terminal de brazo. Lukas lo consulta para leer registros y abrir sistemas.", R.drawable.prop_terminal, "Dispositivo"),
     )
 
     val keyboardControls = listOf(

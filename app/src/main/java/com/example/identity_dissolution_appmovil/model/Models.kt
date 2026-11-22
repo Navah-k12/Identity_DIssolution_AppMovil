@@ -15,7 +15,12 @@ data class Article(
     val featured: Boolean = false,
     /** Captura del GDD (res/drawable-nodpi/gdd_*.webp). */
     @DrawableRes val image: Int? = null,
-)
+    /** Contenido recién añadido: muestra "NUEVO" hasta que se abre. */
+    val isNew: Boolean = false,
+) {
+    /** Minutos de lectura aproximados (200 palabras por minuto). */
+    val readMinutes: Int get() = (body.split(Regex("\\s+")).size / 200).coerceAtLeast(1)
+}
 
 data class Enemy(
     val id: Int,
@@ -39,6 +44,8 @@ data class InventoryItem(
     val description: String,
     /** Render del modelo 3D (res/drawable-nodpi). Si es null se usa el emoji. */
     @DrawableRes val image: Int? = null,
+    /** Tipo de objeto ("Arma", "Médico"...). */
+    val type: String = "Objeto",
 )
 
 data class ControlBinding(val key: String, val action: String)
@@ -53,4 +60,8 @@ data class Settings(
     val language: String = "Español",
     val autoSync: Boolean = true,
     val pulseNotifications: Boolean = true,
+    /** 0f..1f: cuánto se desplaza el texto con el glitch. */
+    val glitchIntensity: Float = 0.6f,
+    /** Tamaño de texto: 0 = A, 1 = A+, 2 = A++. */
+    val textSize: Int = 1,
 )

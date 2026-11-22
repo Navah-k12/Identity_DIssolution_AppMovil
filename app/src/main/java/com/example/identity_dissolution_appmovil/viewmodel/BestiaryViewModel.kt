@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 data class BestiaryUiState(
     val monsters: List<Enemy> = emptyList(),
@@ -64,6 +67,7 @@ class Model3DViewModel(app: Application, savedState: SavedStateHandle) : Android
 
     private val repo = MonsterRepository.get(app)
     private val id: Int = checkNotNull(savedState["id"])
+    val monsterId: Int get() = id
 
     val monster = MutableStateFlow<Enemy?>(null)
     val model = MutableStateFlow<ModelState>(ModelState.Loading)
@@ -75,7 +79,11 @@ class Model3DViewModel(app: Application, savedState: SavedStateHandle) : Android
             model.value = ModelState.Loading
             val enemy = repo.monster(id).also { monster.value = it }
             val url = enemy?.modelUrl
-            model.value = if (url == null) {
+            // Primero el modelo incluido en la app (assets/models): funciona sin internet ni API.
+            val local = loadBundledModel()
+            model.value = if (local != null) {
+                ModelState.Ready(local)
+            } else if (url == null) {
                 ModelState.Error("Este monstruo aún no tiene modelo 3D.")
             } else {
                 runCatching { repo.loadModel(id, url) }.fold(
@@ -84,5 +92,13 @@ class Model3DViewModel(app: Application, savedState: SavedStateHandle) : Android
                 )
             }
         }
+    }
+
+    /** Lee assets/models/monster_<id>.glb si existe (exportado del .blend del juego). */
+    private suspend fun loadBundledModel(): ByteBuffer? = withContext(Dispatchers.IO) {
+        runCatching {
+            val bytes = getApplication<Application>().assets.open("models/monster_$id.glb").use { it.readBytes() }
+            ByteBuffer.allocateDirect(bytes.size).order(ByteOrder.nativeOrder()).put(bytes).apply { rewind() }
+        }.getOrNull()
     }
 }

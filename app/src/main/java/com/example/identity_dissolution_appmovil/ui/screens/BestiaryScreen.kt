@@ -1,54 +1,52 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.SentimentVeryDissatisfied
-import androidx.compose.material.icons.filled.ViewInAr
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,45 +56,34 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.identity_dissolution_appmovil.data.repository.GameRepository
 import com.example.identity_dissolution_appmovil.model.Enemy
-import com.example.identity_dissolution_appmovil.ui.components.HorrorCard
-import com.example.identity_dissolution_appmovil.ui.components.HorrorTopBar
+import com.example.identity_dissolution_appmovil.ui.components.CircleIconButton
+import com.example.identity_dissolution_appmovil.ui.components.Eyebrow
+import com.example.identity_dissolution_appmovil.ui.components.ScreenHeader
+import com.example.identity_dissolution_appmovil.ui.components.Tag
+import com.example.identity_dissolution_appmovil.ui.components.ThinProgress
 import com.example.identity_dissolution_appmovil.ui.theme.Background
 import com.example.identity_dissolution_appmovil.ui.theme.BloodRed
 import com.example.identity_dissolution_appmovil.ui.theme.Border
 import com.example.identity_dissolution_appmovil.ui.theme.DarkRed
 import com.example.identity_dissolution_appmovil.ui.theme.HorrorFont
 import com.example.identity_dissolution_appmovil.ui.theme.Identity_DIssolution_AppMovilTheme
+import com.example.identity_dissolution_appmovil.ui.theme.OnRed
+import com.example.identity_dissolution_appmovil.ui.theme.SoftRed
+import com.example.identity_dissolution_appmovil.ui.theme.Surface
 import com.example.identity_dissolution_appmovil.ui.theme.SurfaceHigh
+import com.example.identity_dissolution_appmovil.ui.theme.TextMain
 import com.example.identity_dissolution_appmovil.ui.theme.TextMuted
 import com.example.identity_dissolution_appmovil.viewmodel.BestiaryUiState
 import com.example.identity_dissolution_appmovil.viewmodel.BestiaryViewModel
 
 @Composable
 fun BestiaryScreen(
-    focusId: Int = -1,
     onBack: () -> Unit,
-    onView3D: (Int) -> Unit,
+    onMonsterClick: (Int) -> Unit,
     viewModel: BestiaryViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
-    val listState = rememberLazyListState()
-
-    // Al venir de "Continuar lectura", baja hasta ese monstruo (una sola vez).
-    var focused by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(state.monsters, focusId) {
-        val index = state.monsters.indexOfFirst { it.id == focusId }
-        if (!focused && index >= 0) {
-            listState.scrollToItem(index + if (state.error != null) 1 else 0)
-            focused = true
-        }
-    }
-    // Guarda el monstruo que está arriba en pantalla como "última lectura".
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key is Int }?.key as Int? }
-            .filterNotNull().distinctUntilChanged()
-            .collect { viewModel.markRead(it) }
-    }
-    BestiaryContent(state, onBack, onView3D, onRetry = viewModel::refresh, listState = listState)
+    BestiaryContent(state, onBack, onMonsterClick, onRetry = viewModel::refresh)
 }
 
 /** Diseño sin ViewModel: así se puede ver en @Preview. */
@@ -104,86 +91,132 @@ fun BestiaryScreen(
 fun BestiaryContent(
     state: BestiaryUiState,
     onBack: () -> Unit,
-    onView3D: (Int) -> Unit,
+    onMonsterClick: (Int) -> Unit,
     onRetry: () -> Unit,
-    listState: LazyListState = rememberLazyListState(),
 ) {
-    Column(Modifier.fillMaxSize()) {
-        HorrorTopBar("Bestiario de pesadilla", onBack = onBack, actions = {
-            IconButton(onClick = onRetry, enabled = !state.isLoading) {
-                Icon(Icons.Filled.Refresh, "Actualizar", tint = BloodRed)
-            }
-        })
+    // Sin API ni copia en Room se muestran los datos locales: el bestiario nunca queda vacío.
+    val monsters = state.monsters.ifEmpty { if (state.isLoading) emptyList() else GameRepository.enemies }
+    val total = GameRepository.enemies.size.coerceAtLeast(monsters.size)
 
-        if (state.isLoading) {
-            LinearProgressIndicator(Modifier.fillMaxWidth().height(2.dp), color = BloodRed, trackColor = Background)
+    Column(Modifier.fillMaxSize()) {
+        ScreenHeader(
+            "Bestiario",
+            leading = { CircleIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Volver", onBack) },
+            trailing = {
+                Text("${monsters.size}", style = MaterialTheme.typography.titleLarge, color = TextMain)
+                Text("/$total", style = MaterialTheme.typography.titleLarge, color = TextMuted)
+            },
+        )
+
+        if (monsters.isEmpty()) {
+            Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator(color = BloodRed) }
+            return@Column
         }
 
-        when {
-            // Primera carga sin copia local.
-            state.monsters.isEmpty() && state.isLoading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
-                CircularProgressIndicator(color = BloodRed)
-            }
-            // Sin datos y sin conexión.
-            state.monsters.isEmpty() -> ErrorBox(state.error ?: "No hay registros.", onRetry)
-            else -> LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                if (state.error != null) {
-                    item {
-                        Text(
-                            "Sin conexión: mostrando la copia guardada.",
-                            color = TextMuted, style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            item(span = { GridItemSpan(2) }) {
+                Row {
+                    Eyebrow("Amenazas registradas", Modifier.weight(1f))
+                    Text("${monsters.size} criaturas", style = MaterialTheme.typography.labelMedium, color = TextMuted)
                 }
-                items(state.monsters, key = { it.id }) { EnemyCard(it, onView3D) }
-                item { CorruptedFooter() }
+            }
+            if (state.error != null && state.monsters.isEmpty()) {
+                item(span = { GridItemSpan(2) }) {
+                    Text(
+                        "Sin conexión: mostrando registros guardados. Toca aquí para reintentar.",
+                        color = TextMuted, style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.clickable(onClick = onRetry),
+                    )
+                }
+            }
+            itemsIndexed(monsters, key = { _, m -> m.id }) { index, monster ->
+                MonsterTile(index + 1, monster) { onMonsterClick(monster.id) }
             }
         }
     }
 }
 
+/** Imagen del monstruo: primero el arte local, si no la imagen de la API. */
 @Composable
-private fun EnemyCard(enemy: Enemy, onView3D: (Int) -> Unit) {
-    HorrorCard(Modifier.fillMaxWidth()) {
-        // 3:2 es el formato de las imágenes cinematográficas de la API.
-        Box(Modifier.fillMaxWidth().aspectRatio(3f / 2f).background(SurfaceHigh)) {
-            if (enemy.imageUrl != null) {
-                AsyncImage(
-                    model = enemy.imageUrl,
-                    contentDescription = enemy.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                Icon(
-                    Icons.Filled.SentimentVeryDissatisfied, null,
-                    tint = BloodRed.copy(alpha = 0.25f),
-                    modifier = Modifier.size(120.dp).align(Alignment.Center),
-                )
-            }
-            // Degradado para que el nombre se lea sobre la imagen.
-            Box(
-                Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent, Background))
-                )
-            )
-            Column(Modifier.align(Alignment.BottomStart).padding(16.dp)) {
-                Text(
-                    enemy.name.uppercase(), color = BloodRed, fontFamily = HorrorFont,
-                    fontWeight = FontWeight.Black, style = MaterialTheme.typography.headlineSmall,
-                )
-                Text(
-                    "CLASE: ${enemy.enemyClass.uppercase()}  •  PELIGRO ${enemy.dangerLevel}",
-                    color = DarkRed, style = MaterialTheme.typography.labelSmall,
-                )
-            }
+private fun MonsterImage(enemy: Enemy, modifier: Modifier) {
+    val local = GameRepository.monsterArt[enemy.id]
+    when {
+        local != null -> Image(painterResource(local), enemy.name, contentScale = ContentScale.Crop, modifier = modifier)
+        enemy.imageUrl != null -> AsyncImage(enemy.imageUrl, enemy.name, contentScale = ContentScale.Crop, modifier = modifier)
+        else -> Box(modifier.background(SurfaceHigh), Alignment.Center) {
+            Icon(Icons.Filled.SentimentVeryDissatisfied, null, tint = BloodRed.copy(alpha = 0.3f), modifier = Modifier.size(64.dp))
         }
+    }
+}
 
-        Column(Modifier.padding(16.dp)) {
+@Composable
+private fun MonsterTile(number: Int, enemy: Enemy, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(16.dp)
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .aspectRatio(0.72f)
+            .clip(shape)
+            .border(BorderStroke(1.dp, DarkRed), shape)
+            .clickable(onClick = onClick),
+    ) {
+        MonsterImage(enemy, Modifier.fillMaxSize())
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(0.5f to Color.Transparent, 1f to Background.copy(alpha = 0.95f))
+            )
+        )
+        Column(Modifier.align(Alignment.BottomStart).padding(12.dp)) {
+            Text("REGISTRO %02d".format(number), style = MaterialTheme.typography.labelSmall, color = SoftRed)
+            Spacer(Modifier.height(4.dp))
+            Text(enemy.name, fontFamily = HorrorFont, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium, color = TextMain)
+        }
+    }
+}
+
+@Composable
+fun MonsterDetailScreen(
+    monsterId: Int,
+    onBack: () -> Unit,
+    onSummon: (Int) -> Unit,
+    viewModel: BestiaryViewModel = viewModel(),
+) {
+    val state by viewModel.state.collectAsState()
+    // Abrir un monstruo lo guarda como "última lectura" para Inicio.
+    LaunchedEffect(monsterId) { viewModel.markRead(monsterId) }
+    val enemy = state.monsters.find { it.id == monsterId } ?: GameRepository.enemies.find { it.id == monsterId }
+    MonsterDetailContent(enemy, onBack, onSummon)
+}
+
+@Composable
+fun MonsterDetailContent(enemy: Enemy?, onBack: () -> Unit, onSummon: (Int) -> Unit) {
+    Column(Modifier.fillMaxSize()) {
+        ScreenHeader(
+            enemy?.name ?: "Registro",
+            leading = { CircleIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Volver", onBack) },
+        )
+        if (enemy == null) {
+            Text("Archivo corrupto.", color = TextMuted, modifier = Modifier.padding(20.dp))
+            return@Column
+        }
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
+            val shape = RoundedCornerShape(16.dp)
+            Box(Modifier.fillMaxWidth().aspectRatio(0.9f).clip(shape).border(1.dp, DarkRed, shape)) {
+                MonsterImage(enemy, Modifier.fillMaxSize())
+                Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.6f to Color.Transparent, 1f to Background)))
+                Row(Modifier.align(Alignment.BottomStart).padding(16.dp)) {
+                    Tag(enemy.enemyClass, filled = true)
+                    Spacer(Modifier.size(8.dp))
+                    Tag("Peligro ${enemy.dangerLevel}")
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
             Row {
                 StatBar("Peligro", enemy.danger, Modifier.weight(1f))
                 Spacer(Modifier.size(16.dp))
@@ -192,96 +225,70 @@ private fun EnemyCard(enemy: Enemy, onView3D: (Int) -> Unit) {
             InfoBlock("Comportamiento", enemy.behavior)
             InfoBlock("Estrategia", enemy.strategy)
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(20.dp))
             Button(
-                onClick = { onView3D(enemy.id) },
-                enabled = enemy.modelUrl != null,
-                shape = RoundedCornerShape(10.dp),
+                // Abre la cámara: el monstruo aparece en tu mundo, como en Pokémon GO.
+                onClick = { onSummon(enemy.id) },
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = DarkRed,
-                    contentColor = Color.White,
+                    containerColor = BloodRed,
+                    contentColor = OnRed,
                     disabledContainerColor = SurfaceHigh,
                     disabledContentColor = TextMuted,
                 ),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(48.dp),
             ) {
-                Icon(Icons.Filled.ViewInAr, null)
+                Icon(Icons.Filled.CameraAlt, null)
                 Spacer(Modifier.size(8.dp))
-                Text(
-                    if (enemy.modelUrl != null) "VER MODELO 3D" else "MODELO 3D PRÓXIMAMENTE",
-                    fontWeight = FontWeight.Bold,
-                )
+                Text("INVOCAR MONSTRUO", fontFamily = HorrorFont, fontWeight = FontWeight.Bold)
             }
+            Spacer(Modifier.height(16.dp))
+            Text(
+                "ARCHIVO INCOMPLETO... ENCUENTRA MÁS INFORMACIÓN EN EL JUEGO.",
+                color = TextMuted, fontFamily = HorrorFont, fontStyle = FontStyle.Italic,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
 
 @Composable
-private fun ErrorBox(message: String, onRetry: () -> Unit) {
-    Column(
-        Modifier.fillMaxSize().padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            "ARCHIVO INACCESIBLE", color = BloodRed, fontFamily = HorrorFont, fontWeight = FontWeight.Bold,
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(message, color = TextMuted, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodySmall)
-        Spacer(Modifier.height(16.dp))
-        Button(
-            onClick = onRetry,
-            colors = ButtonDefaults.buttonColors(containerColor = DarkRed, contentColor = Color.White),
-        ) { Text("REINTENTAR") }
-    }
-}
-
-@Composable
-private fun CorruptedFooter() {
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .border(BorderStroke(1.dp, Border), RoundedCornerShape(14.dp))
-            .padding(24.dp),
-    ) {
-        Text(
-            "ARCHIVO CORRUPTO... ENCUENTRA MÁS INFORMACIÓN EN EL JUEGO.",
-            color = TextMuted, fontFamily = HorrorFont, fontStyle = FontStyle.Italic,
-            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
-        )
-    }
-}
-
-@Composable
 private fun StatBar(label: String, value: Float, modifier: Modifier) {
-    Column(modifier) {
-        Text(label.uppercase(), style = MaterialTheme.typography.labelSmall, color = TextMuted)
-        Spacer(Modifier.height(6.dp))
-        LinearProgressIndicator(
-            progress = { value },
-            color = DarkRed,
-            trackColor = SurfaceHigh,
-            strokeCap = StrokeCap.Round,
-            modifier = Modifier.fillMaxWidth().height(6.dp),
-        )
+    Column(modifier.background(Surface, RoundedCornerShape(12.dp)).border(1.dp, Border, RoundedCornerShape(12.dp)).padding(12.dp)) {
+        Row {
+            Eyebrow(label, Modifier.weight(1f))
+            Text("${(value * 100).toInt()}", style = MaterialTheme.typography.labelMedium, color = BloodRed)
+        }
+        Spacer(Modifier.height(8.dp))
+        ThinProgress(value, Modifier.fillMaxWidth())
     }
 }
 
 @Composable
 private fun InfoBlock(title: String, text: String) {
-    Spacer(Modifier.height(16.dp))
-    Text(title.uppercase(), style = MaterialTheme.typography.labelSmall, color = BloodRed)
-    HorizontalDivider(Modifier.padding(vertical = 6.dp), color = Border)
-    Text(text, style = MaterialTheme.typography.bodySmall, fontStyle = FontStyle.Italic)
+    Spacer(Modifier.height(20.dp))
+    Text(title.uppercase(), style = MaterialTheme.typography.labelMedium, color = BloodRed)
+    HorizontalDivider(Modifier.padding(vertical = 8.dp), color = Border)
+    Text(text, style = MaterialTheme.typography.bodyMedium, color = TextMain)
 }
 
-@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFF0B0A0A)
+@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 fun BestiaryScreenPreview() {
     Identity_DIssolution_AppMovilTheme {
         BestiaryContent(
             state = BestiaryUiState(monsters = GameRepository.enemies),
-            onBack = {}, onView3D = {}, onRetry = {},
+            onBack = {}, onMonsterClick = {}, onRetry = {},
         )
+    }
+}
+
+@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFF0A0A0A)
+@Composable
+fun MonsterDetailPreview() {
+    Identity_DIssolution_AppMovilTheme {
+        MonsterDetailContent(GameRepository.enemies.first(), onBack = {}, onSummon = {})
     }
 }

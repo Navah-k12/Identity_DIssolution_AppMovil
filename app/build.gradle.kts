@@ -72,6 +72,10 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.sceneview)
     implementation(libs.arsceneview)
+    // Cámara normal para el AR clásico con giroscopio (teléfonos sin ARCore).
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))

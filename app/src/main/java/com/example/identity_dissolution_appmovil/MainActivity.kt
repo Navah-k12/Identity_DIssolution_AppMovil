@@ -17,6 +17,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.identity_dissolution_appmovil.ui.components.LocalVisualEffects
 import com.example.identity_dissolution_appmovil.ui.components.VisualEffects
@@ -49,7 +51,13 @@ class MainActivity : ComponentActivity() {
             val settings by settingsViewModel.state.collectAsState()
 
             Identity_DIssolution_AppMovilTheme {
-                CompositionLocalProvider(LocalVisualEffects provides VisualEffects(glitch = settings.glitchEffect)) {
+                // Tamaño de texto de Ajustes (A / A+ / A++) aplicado a toda la app.
+                val density = LocalDensity.current
+                val scale = when (settings.textSize) { 0 -> 0.9f; 2 -> 1.15f; else -> 1f }
+                CompositionLocalProvider(
+                    LocalVisualEffects provides VisualEffects(settings.glitchEffect, settings.glitchIntensity),
+                    LocalDensity provides Density(density.density, density.fontScale * scale),
+                ) {
                     Box(
                         Modifier
                             .fillMaxSize()

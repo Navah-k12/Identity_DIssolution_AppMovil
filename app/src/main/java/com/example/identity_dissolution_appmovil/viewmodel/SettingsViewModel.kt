@@ -30,5 +30,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     fun toggleLanguage() = save {
         setLanguage(if (state.value.language == "Español") "English" else "Español")
     }
+    fun setGlitchIntensity(v: Float) = save { setGlitchIntensity(v) }
+    fun setTextSize(v: Int) = save { setTextSize(v) }
     fun reset() = save { clear() }
 }

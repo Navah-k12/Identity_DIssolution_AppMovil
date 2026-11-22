@@ -1,196 +1,394 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.identity_dissolution_appmovil.ui.theme.Identity_DIssolution_AppMovilTheme
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
-import com.example.identity_dissolution_appmovil.data.repository.LastRead
-import com.example.identity_dissolution_appmovil.data.repository.ReadingRepository
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.identity_dissolution_appmovil.data.repository.GameRepository
+import com.example.identity_dissolution_appmovil.data.repository.LastRead
+import com.example.identity_dissolution_appmovil.data.repository.ReadingRepository
 import com.example.identity_dissolution_appmovil.model.Article
+import com.example.identity_dissolution_appmovil.model.ArticleCategory
+import com.example.identity_dissolution_appmovil.ui.components.CircleIconButton
+import com.example.identity_dissolution_appmovil.ui.components.Eyebrow
 import com.example.identity_dissolution_appmovil.ui.components.HorrorCard
 import com.example.identity_dissolution_appmovil.ui.components.HorrorTopBar
+import com.example.identity_dissolution_appmovil.ui.components.ScreenHeader
+import com.example.identity_dissolution_appmovil.ui.components.Tag
+import com.example.identity_dissolution_appmovil.ui.components.ThinProgress
 import com.example.identity_dissolution_appmovil.ui.theme.Background
 import com.example.identity_dissolution_appmovil.ui.theme.BloodRed
 import com.example.identity_dissolution_appmovil.ui.theme.Border
 import com.example.identity_dissolution_appmovil.ui.theme.DarkRed
 import com.example.identity_dissolution_appmovil.ui.theme.HorrorFont
+import com.example.identity_dissolution_appmovil.ui.theme.Identity_DIssolution_AppMovilTheme
+import com.example.identity_dissolution_appmovil.ui.theme.OnRed
+import com.example.identity_dissolution_appmovil.ui.theme.SoftRed
+import com.example.identity_dissolution_appmovil.ui.theme.Surface
+import com.example.identity_dissolution_appmovil.ui.theme.SurfaceHigh
+import com.example.identity_dissolution_appmovil.ui.theme.TextFaint
+import com.example.identity_dissolution_appmovil.ui.theme.TextMain
 import com.example.identity_dissolution_appmovil.ui.theme.TextMuted
 import com.example.identity_dissolution_appmovil.viewmodel.EncyclopediaViewModel
+import com.example.identity_dissolution_appmovil.viewmodel.HomeViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 
 @Composable
 fun EncyclopediaScreen(
-    onBack: () -> Unit,
     onArticleClick: (Int) -> Unit,
     viewModel: EncyclopediaViewModel = viewModel(),
 ) {
     val query by viewModel.query.collectAsState()
+    val category by viewModel.category.collectAsState()
     val results by viewModel.results.collectAsState()
-    EncyclopediaContent(query, results, viewModel::onQueryChange, onBack, onArticleClick)
+
+    val context = LocalContext.current
+    val reading = remember { ReadingRepository.get(context) }
+    val progress by reading.progress.collectAsState(initial = emptyMap())
+    val bookmarks by reading.bookmarks.collectAsState(initial = emptySet())
+    val scope = rememberCoroutineScope()
+    var onlyBookmarks by remember { mutableStateOf(false) }
+
+    EncyclopediaContent(
+        query = query,
+        category = category,
+        results = if (onlyBookmarks) results.filter { it.id in bookmarks } else results,
+        progress = progress,
+        bookmarks = bookmarks,
+        onlyBookmarks = onlyBookmarks,
+        onQueryChange = viewModel::onQueryChange,
+        onCategoryChange = viewModel::onCategoryChange,
+        onToggleOnlyBookmarks = { onlyBookmarks = !onlyBookmarks },
+        onToggleBookmark = { id -> scope.launch { reading.toggleBookmark(id) } },
+        onArticleClick = onArticleClick,
+    )
 }
 
 /** Diseño sin ViewModel: así se puede ver en @Preview. */
 @Composable
 fun EncyclopediaContent(
     query: String,
+    category: ArticleCategory?,
     results: List<Article>,
+    progress: Map<Int, Float>,
+    bookmarks: Set<Int>,
+    onlyBookmarks: Boolean,
     onQueryChange: (String) -> Unit,
-    onBack: () -> Unit,
+    onCategoryChange: (ArticleCategory?) -> Unit,
+    onToggleOnlyBookmarks: () -> Unit,
+    onToggleBookmark: (Int) -> Unit,
     onArticleClick: (Int) -> Unit,
 ) {
-    Column(Modifier.fillMaxSize()) {
-        HorrorTopBar("Registros de sangre", onBack = onBack)
+    // El destacado solo aparece en la vista general (sin buscar ni filtrar).
+    val featured = results.firstOrNull { it.featured }
+        ?.takeIf { query.isBlank() && category == null && !onlyBookmarks }
+    val list = results.filter { it != featured }
 
-        OutlinedTextField(
-            value = query,
-            onValueChange = onQueryChange,
-            placeholder = { Text("Buscar en los archivos...", fontFamily = HorrorFont) },
-            leadingIcon = { Icon(Icons.Filled.Search, null, tint = BloodRed) },
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = BloodRed,
-                unfocusedBorderColor = DarkRed,
-            ),
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-        )
+    Column(Modifier.fillMaxSize()) {
+        ScreenHeader("Registros de sangre", trailing = {
+            CircleIconButton(
+                if (onlyBookmarks) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                "Ver guardados", onToggleOnlyBookmarks,
+            )
+        })
 
         LazyColumn(
-            contentPadding = PaddingValues(16.dp, 0.dp, 16.dp, 16.dp),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            if (results.isEmpty()) {
+            item { SearchField(query, onQueryChange) }
+            item { CategoryChips(category, onCategoryChange) }
+            featured?.let { a ->
+                item(key = "featured") {
+                    FeaturedCard(a, progress[a.id] ?: 0f) { onArticleClick(a.id) }
+                }
+            }
+            item {
+                Row(Modifier.padding(top = 8.dp)) {
+                    Eyebrow(if (onlyBookmarks) "Guardados" else "Archivos", Modifier.weight(1f))
+                    Text("${list.size} registros", style = MaterialTheme.typography.labelMedium, color = TextMuted)
+                }
+            }
+            if (list.isEmpty()) {
                 item {
                     Text("Ningún registro coincide... algo los borró.", color = TextMuted, fontFamily = HorrorFont)
                 }
             }
-            items(results, key = { it.id }) { article ->
-                if (article.featured && query.isBlank()) {
-                    FeaturedCard(article) { onArticleClick(article.id) }
-                } else {
-                    ArticleRow(article) { onArticleClick(article.id) }
-                }
+            items(list, key = { it.id }) { article ->
+                ArticleRow(
+                    article,
+                    progress = progress[article.id],
+                    bookmarked = article.id in bookmarks,
+                    onBookmark = { onToggleBookmark(article.id) },
+                ) { onArticleClick(article.id) }
             }
         }
     }
 }
 
 @Composable
-private fun FeaturedCard(article: Article, onClick: () -> Unit) {
-    HorrorCard(Modifier.fillMaxWidth(), onClick = onClick) {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(170.dp)
-                .background(DarkRed.copy(alpha = 0.3f)),
-            contentAlignment = Alignment.BottomStart,
-        ) {
-            if (article.image != null) {
-                Image(
-                    painterResource(article.image), null,
-                    contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(),
-                )
+private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
+    val shape = RoundedCornerShape(12.dp)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .background(Surface, shape)
+            .border(1.dp, Border, shape)
+            .padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Outlined.Search, null, tint = BloodRed, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(10.dp))
+        Box(Modifier.weight(1f)) {
+            if (query.isEmpty()) {
+                Text("Buscar en los archivos…", fontFamily = HorrorFont, color = TextFaint, style = MaterialTheme.typography.bodyMedium)
             }
-            // Degradado para leer el texto sobre la imagen.
-            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Background))))
-            Column(Modifier.padding(14.dp)) {
-                Text(
-                    "DESTACADO: ${article.title.uppercase()}",
-                    color = BloodRed, fontFamily = HorrorFont, fontWeight = FontWeight.Bold,
-                )
-                Text(article.summary, style = MaterialTheme.typography.bodySmall, color = TextMuted)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ArticleRow(article: Article, onClick: () -> Unit) {
-    HorrorCard(Modifier.fillMaxWidth(), onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            // Barra roja a la izquierda, como en el diseño.
-            Box(Modifier.width(4.dp).height(84.dp).background(DarkRed))
-            if (article.image != null) {
-                Image(
-                    painterResource(article.image), null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.padding(start = 10.dp).size(64.dp).clip(RoundedCornerShape(8.dp)),
-                )
-            }
-            Column(Modifier.weight(1f).padding(14.dp)) {
-                Text(
-                    "${article.category.label.uppercase()}: ${article.title.uppercase()}",
-                    color = BloodRed, fontFamily = HorrorFont, fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(article.summary, style = MaterialTheme.typography.bodySmall, color = TextMuted)
-            }
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowRight, null,
-                tint = BloodRed, modifier = Modifier.padding(end = 8.dp),
+            BasicTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                singleLine = true,
+                textStyle = TextStyle(color = TextMain, fontFamily = HorrorFont, fontSize = MaterialTheme.typography.bodyMedium.fontSize),
+                cursorBrush = SolidColor(BloodRed),
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
 }
 
 @Composable
+private fun CategoryChips(selected: ArticleCategory?, onSelect: (ArticleCategory?) -> Unit) {
+    val options = listOf<ArticleCategory?>(null) + ArticleCategory.entries
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(options) { cat ->
+            val active = cat == selected
+            Text(
+                cat?.label ?: "Todo",
+                fontFamily = HorrorFont,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (active) OnRed else TextMain,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(if (active) BloodRed else Surface)
+                    .border(1.dp, if (active) BloodRed else Border, CircleShape)
+                    .clickable { onSelect(cat) }
+                    .padding(horizontal = 18.dp, vertical = 10.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun FeaturedCard(article: Article, progress: Float, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(16.dp)
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(Surface)
+            .border(BorderStroke(1.dp, DarkRed), shape)
+            .clickable(onClick = onClick),
+    ) {
+        if (article.image != null) {
+            Image(
+                painterResource(article.image), null,
+                contentScale = ContentScale.Crop,
+                alpha = 0.35f,
+                modifier = Modifier.matchParentSize(),
+            )
+        }
+        Box(Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Transparent, Background.copy(alpha = 0.9f)))))
+        Column(Modifier.padding(16.dp)) {
+            Spacer(Modifier.height(24.dp))
+            Tag("Destacado", filled = true)
+            Spacer(Modifier.height(8.dp))
+            Text(article.title.uppercase(), color = BloodRed, style = MaterialTheme.typography.titleLarge)
+            Spacer(Modifier.height(6.dp))
+            Text(article.summary, style = MaterialTheme.typography.bodyMedium, color = TextMain)
+            Spacer(Modifier.height(16.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    ThinProgress(progress, Modifier.fillMaxWidth())
+                    Spacer(Modifier.height(6.dp))
+                    Text("${(progress * 100).toInt()}% LEÍDO", style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                }
+                Spacer(Modifier.width(12.dp))
+                Button(
+                    onClick = onClick,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BloodRed, contentColor = OnRed),
+                    modifier = Modifier.height(44.dp),
+                ) {
+                    Text(if (progress > 0f) "CONTINUAR" else "LEER", fontFamily = HorrorFont, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ArticleRow(
+    article: Article,
+    progress: Float?,
+    bookmarked: Boolean,
+    onBookmark: () -> Unit,
+    onClick: () -> Unit,
+) {
+    HorrorCard(Modifier.fillMaxWidth(), onClick = onClick) {
+        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
+            Box(
+                Modifier
+                    .size(64.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(DarkRed.copy(alpha = 0.15f))
+                    .border(1.dp, Border, RoundedCornerShape(10.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (article.image != null) {
+                    Image(
+                        painterResource(article.image), null,
+                        contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(),
+                    )
+                } else {
+                    Icon(Icons.Outlined.Description, null, tint = DarkRed, modifier = Modifier.size(24.dp))
+                }
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Tag(article.category.label)
+                    Spacer(Modifier.width(8.dp))
+                    ReadStatus(article, progress)
+                }
+                Spacer(Modifier.height(6.dp))
+                Text(article.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(article.summary, style = MaterialTheme.typography.bodySmall, color = TextMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Spacer(Modifier.height(6.dp))
+                Text("${article.readMinutes} min de lectura", style = MaterialTheme.typography.labelSmall, color = TextFaint)
+            }
+            Icon(
+                if (bookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                if (bookmarked) "Quitar marcador" else "Guardar",
+                tint = if (bookmarked) BloodRed else TextMuted,
+                modifier = Modifier.clip(CircleShape).clickable(onClick = onBookmark).padding(4.dp).size(22.dp),
+            )
+        }
+    }
+}
+
+/** "● NUEVO", "✓ LEÍDO" o el porcentaje leído. */
+@Composable
+private fun ReadStatus(article: Article, progress: Float?) {
+    val style = MaterialTheme.typography.labelSmall
+    when {
+        progress == null && article.isNew -> Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(6.dp).background(BloodRed, CircleShape))
+            Spacer(Modifier.width(4.dp))
+            Text("NUEVO", style = style, color = SoftRed)
+        }
+        progress != null && progress >= HomeViewModel.READ_THRESHOLD -> Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.Check, null, tint = TextMuted, modifier = Modifier.size(12.dp))
+            Spacer(Modifier.width(4.dp))
+            Text("LEÍDO", style = style, color = TextMuted)
+        }
+        progress != null -> Text("${(progress * 100).toInt()}%", style = style, color = TextMuted)
+    }
+}
+
+@OptIn(FlowPreview::class)
+@Composable
 fun ArticleDetailScreen(
     articleId: Int,
     onBack: () -> Unit,
     viewModel: EncyclopediaViewModel = viewModel(),
 ) {
-    // Abrir un artículo lo guarda como "última lectura" para Inicio.
     val context = LocalContext.current
-    LaunchedEffect(articleId) { ReadingRepository.get(context).save(LastRead.Guide(articleId)) }
-    ArticleDetailContent(viewModel.article(articleId), onBack)
+    val reading = remember { ReadingRepository.get(context) }
+    val scroll = rememberScrollState()
+    // Abrir un artículo lo guarda como "última lectura" para Inicio.
+    LaunchedEffect(articleId) { reading.save(LastRead.Guide(articleId)) }
+    // Guarda hasta dónde se bajó: eso es el progreso de lectura.
+    LaunchedEffect(articleId, scroll) {
+        snapshotFlow { if (scroll.maxValue in 1 until Int.MAX_VALUE) scroll.value.toFloat() / scroll.maxValue else if (scroll.maxValue == 0) 1f else 0f }
+            .debounce(300)
+            .collect { reading.saveProgress(articleId, it) }
+    }
+    ArticleDetailContent(viewModel.article(articleId), onBack, scroll)
 }
 
 @Composable
-fun ArticleDetailContent(article: Article?, onBack: () -> Unit) {
+fun ArticleDetailContent(
+    article: Article?,
+    onBack: () -> Unit,
+    scroll: androidx.compose.foundation.ScrollState = rememberScrollState(),
+) {
     Column(Modifier.fillMaxSize()) {
-        HorrorTopBar(article?.category?.label ?: "Archivo", onBack = onBack)
-        Column(Modifier.verticalScroll(rememberScrollState()).padding(20.dp)) {
+        ScreenHeader(
+            article?.category?.label ?: "Archivo",
+            leading = { CircleIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Volver", onBack) },
+        )
+        Column(Modifier.verticalScroll(scroll).padding(horizontal = 20.dp, vertical = 8.dp)) {
             if (article == null) {
                 Text("Archivo corrupto.", color = TextMuted)
                 return@Column
@@ -199,32 +397,41 @@ fun ArticleDetailContent(article: Article?, onBack: () -> Unit) {
                 Image(
                     painterResource(article.image), article.title,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(12.dp)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(16f / 9f)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(1.dp, Border, RoundedCornerShape(16.dp)),
                 )
                 Spacer(Modifier.height(16.dp))
             }
-            Text(
-                article.title.uppercase(),
-                color = BloodRed, fontFamily = HorrorFont, fontWeight = FontWeight.Black,
-                style = MaterialTheme.typography.headlineSmall,
-            )
+            Text(article.title.uppercase(), color = BloodRed, style = MaterialTheme.typography.headlineSmall)
+            Spacer(Modifier.height(8.dp))
+            Text("${article.readMinutes} MIN DE LECTURA", style = MaterialTheme.typography.labelSmall, color = TextFaint)
             Spacer(Modifier.height(8.dp))
             Text(article.summary, color = TextMuted, style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(16.dp))
             Box(Modifier.fillMaxWidth().height(1.dp).background(Border))
             Spacer(Modifier.height(16.dp))
             Text(article.body, style = MaterialTheme.typography.bodyLarge)
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
 
-@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFF0B0A0A)
+@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 fun EncyclopediaScreenPreview() {
-    Identity_DIssolution_AppMovilTheme { EncyclopediaContent(query = "", results = GameRepository.articles, onQueryChange = {}, onBack = {}, onArticleClick = {}) }
+    Identity_DIssolution_AppMovilTheme {
+        EncyclopediaContent(
+            query = "", category = null, results = GameRepository.articles,
+            progress = mapOf(1 to 0.62f, 3 to 1f), bookmarks = setOf(2), onlyBookmarks = false,
+            onQueryChange = {}, onCategoryChange = {}, onToggleOnlyBookmarks = {}, onToggleBookmark = {}, onArticleClick = {},
+        )
+    }
 }
 
-@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFF0B0A0A)
+@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFF0A0A0A)
 @Composable
 fun ArticleDetailScreenPreview() {
     Identity_DIssolution_AppMovilTheme { ArticleDetailContent(article = GameRepository.articles[1], onBack = {}) }

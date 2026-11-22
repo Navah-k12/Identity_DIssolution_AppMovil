@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 
 private val HeartbeatColors = darkColorScheme(
     primary = BloodRed,
-    onPrimary = TextMain,
+    onPrimary = OnRed,
     primaryContainer = DarkRed,
     secondary = TextMuted,
     background = Background,

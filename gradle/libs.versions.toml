@@ -19,6 +19,7 @@ okhttp = "5.1.0"
 serializationJson = "1.9.0"
 coil = "3.3.0"
 sceneview = "2.3.0"
+camerax = "1.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +55,9 @@ coil-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version.ref = "coil"
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 sceneview = { group = "io.github.sceneview", name = "sceneview", version.ref = "sceneview" }
 arsceneview = { group = "io.github.sceneview", name = "arsceneview", version.ref = "sceneview" }
+camerax-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
+camerax-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
+camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

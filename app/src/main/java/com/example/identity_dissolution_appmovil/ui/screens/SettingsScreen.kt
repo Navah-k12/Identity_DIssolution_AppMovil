@@ -4,6 +4,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.identity_dissolution_appmovil.ui.theme.Identity_DIssolution_AppMovilTheme
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Slider
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
+import com.example.identity_dissolution_appmovil.R
+import com.example.identity_dissolution_appmovil.ui.components.GlitchText
+import com.example.identity_dissolution_appmovil.ui.components.ScreenHeader
+import com.example.identity_dissolution_appmovil.ui.components.retroScanlines
+import com.example.identity_dissolution_appmovil.ui.theme.Background
+import com.example.identity_dissolution_appmovil.ui.theme.HorrorFont
+import com.example.identity_dissolution_appmovil.ui.theme.OnRed
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -48,6 +70,8 @@ import com.example.identity_dissolution_appmovil.ui.theme.TextMuted
 import com.example.identity_dissolution_appmovil.model.Settings
 import com.example.identity_dissolution_appmovil.viewmodel.SettingsViewModel
 
+private val BloodFont = FontFamily(Font(R.font.rubik_wet_paint))
+
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val s by viewModel.state.collectAsState()
@@ -58,6 +82,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
         onToggleLanguage = viewModel::toggleLanguage,
         onAutoSync = viewModel::setAutoSync,
         onPulse = viewModel::setPulseNotifications,
+        onIntensity = viewModel::setGlitchIntensity,
+        onTextSize = viewModel::setTextSize,
         onReset = viewModel::reset,
     )
 }
@@ -71,23 +97,62 @@ fun SettingsContent(
     onToggleLanguage: () -> Unit = {},
     onAutoSync: (Boolean) -> Unit = {},
     onPulse: (Boolean) -> Unit = {},
+    onIntensity: (Float) -> Unit = {},
+    onTextSize: (Int) -> Unit = {},
     onReset: () -> Unit = {},
 ) {
     var dialog by remember { mutableStateOf<Pair<String, String>?>(null) }
 
     Column(Modifier.fillMaxSize()) {
-        HorrorTopBar("Configuración del sistema")
-        Column(Modifier.verticalScroll(rememberScrollState()).padding(16.dp)) {
+        ScreenHeader("Configuración del sistema")
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 4.dp)) {
 
             SectionLabel("Visual y ambiente")
             HorrorCard(Modifier.fillMaxWidth()) {
+                // Vista previa en vivo del glitch y del post-procesado.
+                Box(
+                    Modifier.fillMaxWidth().height(96.dp).background(Background).retroScanlines(s.retroPostProcess),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    GlitchText("SOBREVIVIR", style = TextStyle(fontFamily = BloodFont, fontSize = 30.sp, letterSpacing = 2.sp), color = BloodRed)
+                }
                 ToggleRow(
                     "Efecto de glitch", s.glitchEffect, onGlitch,
-                    subtitle = "Reduce el movimiento si experimentas mareos o fatiga visual.",
+                    subtitle = "Distorsión en títulos y transiciones. Desactívalo si sientes mareo o fatiga visual.",
                 )
                 Divider()
                 ToggleRow("Post-procesado retro", s.retroPostProcess, onRetro,
                     subtitle = "Líneas de monitor antiguo sobre toda la app.")
+                Divider()
+                IntensityRow(s.glitchIntensity, enabled = s.glitchEffect, onChange = onIntensity)
+            }
+
+            Spacer(Modifier.height(16.dp))
+            SectionLabel("Accesibilidad")
+            HorrorCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("Tamaño de texto", style = MaterialTheme.typography.bodyLarge)
+                    Spacer(Modifier.height(12.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("A", "A+", "A++").forEachIndexed { i, label ->
+                            val active = s.textSize == i
+                            Box(
+                                Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (active) BloodRed else Background)
+                                    .border(1.dp, if (active) BloodRed else Border, RoundedCornerShape(10.dp))
+                                    .clickable { onTextSize(i) },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(label, fontFamily = HorrorFont, fontWeight = FontWeight.Bold, color = if (active) OnRed else TextMain)
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Text("El silencio es el primer síntoma de que ya no estás solo.", style = MaterialTheme.typography.bodyLarge, color = TextMuted)
+                }
             }
 
             Spacer(Modifier.height(16.dp))
@@ -137,6 +202,34 @@ fun SettingsContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun IntensityRow(value: Float, enabled: Boolean, onChange: (Float) -> Unit) {
+    // Valor local mientras se arrastra; se guarda en DataStore al soltar.
+    var local by remember(value) { mutableFloatStateOf(value) }
+    Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+        Row {
+            Text("Intensidad del glitch", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            Text("${(local * 100).toInt()}%", style = MaterialTheme.typography.labelMedium, color = BloodRed)
+        }
+        Slider(
+            value = local,
+            onValueChange = { local = it },
+            onValueChangeFinished = { onChange(local) },
+            enabled = enabled,
+            // Pista fina y pulgar redondo, como en el diseño.
+            thumb = {
+                Box(Modifier.size(20.dp).background(if (enabled) BloodRed else TextMuted, CircleShape))
+            },
+            track = {
+                Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(Border)) {
+                    Box(Modifier.fillMaxWidth(local).fillMaxHeight().background(if (enabled) BloodRed else TextMuted))
+                }
+            },
+        )
+    }
+}
+
 @Composable
 private fun Divider() = HorizontalDivider(color = Border, modifier = Modifier.padding(horizontal = 16.dp))
 
@@ -156,6 +249,7 @@ private fun ToggleRow(title: String, checked: Boolean, onChange: (Boolean) -> Un
             colors = SwitchDefaults.colors(
                 checkedTrackColor = DarkRed,
                 checkedThumbColor = TextMain,
+                checkedBorderColor = BloodRed,
                 uncheckedTrackColor = SurfaceHigh,
                 uncheckedThumbColor = TextMuted,
                 uncheckedBorderColor = Border,

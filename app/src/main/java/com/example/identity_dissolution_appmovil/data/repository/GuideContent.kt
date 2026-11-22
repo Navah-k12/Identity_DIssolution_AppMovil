@@ -35,7 +35,7 @@ object GuideContent {
                 "Lukas no debe buscarla.\n\n" +
                 "De fondo, casi inaudible, suena el latido del laboratorio. Lukas oye el primer acto sin saberlo. " +
                 "Va igual, por obstinación, y entra con su acceso de técnico.",
-            image = R.drawable.gdd_lukas_civil,
+            image = R.drawable.gdd_lukas_civil, isNew = true,
         ),
         Article(
             3, LORE, "El laboratorio es la criatura",
