@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,7 +50,7 @@ fun Model3DScreen(onBack: () -> Unit, onOpenAR: (Int) -> Unit, viewModel: Model3
     val model by viewModel.model.collectAsState()
 
     Column(Modifier.fillMaxSize()) {
-        HorrorTopBar(monster?.name ?: "Modelo 3D", onBack = onBack)
+        HorrorTopBar(monster?.name ?: tr("Modelo 3D"), onBack = onBack)
 
         Box(Modifier.fillMaxSize().background(Background), contentAlignment = Alignment.Center) {
             when (val m = model) {
@@ -77,7 +79,7 @@ fun Model3DScreen(onBack: () -> Unit, onOpenAR: (Int) -> Unit, viewModel: Model3
                         modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
                     ) { Text("VER EN TU MUNDO (AR)") }
                     Text(
-                        "Arrastra para girar • Pellizca para acercar",
+                        tr("Arrastra para girar • Pellizca para acercar"),
                         color = TextMuted,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,

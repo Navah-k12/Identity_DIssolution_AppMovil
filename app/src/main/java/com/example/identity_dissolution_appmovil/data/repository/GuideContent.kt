@@ -44,6 +44,7 @@ object GuideContent {
                 "Se reacomoda en cada intento: la generación procedural es el laboratorio cambiando de forma. " +
                 "También corrompe lo escrito y toma cosas de la memoria, como la foto imposible del piso 2.\n\n" +
                 "No es un virus ni un arma biológica.",
+            image = R.drawable.gdd_piso2,
         ),
         Article(
             4, LORE, "El latido",
@@ -52,6 +53,7 @@ object GuideContent {
                 "completo queda asimilado. Nunca se explica qué dice.\n\n" +
                 "El latido que se oye en la instalación solo repite el primer acto. Inquieta, pero no asimila. " +
                 "Crece con cada muerte y cuando la salud está en Crítico. El segundo acto solo sonó completo en el incidente.",
+            image = R.drawable.gdd_calibracion_latido,
         ),
         Article(
             5, LORE, "Reconstruye, asimila",
@@ -87,6 +89,7 @@ object GuideContent {
                 "The Mother la reconstruyó como R-H-01 y Vitalis la despidió.\n\n" +
                 "Volvió una sola vez, el 2082-10-19, para saber qué es el latido, y no salió. Sus 6 documentos están " +
                 "repartidos en los 3 pisos. Reunirlos todos cambia el final.",
+            image = R.drawable.gdd_terminal_documentos,
         ),
         Article(
             12, CHARACTER, "The Mother",
@@ -95,7 +98,7 @@ object GuideContent {
                 "reconstruye a todo el que conserva identidad y envía reportes que nadie lee.\n\n" +
                 "Habla por altavoces y terminales con humor negro corporativo. Su cuerpo es un archivo de muestras " +
                 "criogénicas montado en una grúa, en la central de megafonía del piso 3. No es la criatura: es solo máquina.",
-            image = R.drawable.gdd_mother,
+            image = R.drawable.gdd_mother_fase2,
         ),
         Article(
             13, CHARACTER, "Vitalis Konzern",
@@ -104,6 +107,7 @@ object GuideContent {
                 "Dentro hacía experimentos ilegales e inhumanos.\n\n" +
                 "Tras el incidente selló la instalación. Hoy solo está presente en documentos, carteles en alemán y propaganda. " +
                 "Nunca interviene directamente.",
+            image = R.drawable.gdd_menu_terminal,
         ),
         Article(
             14, CHARACTER, "Kessler Sicherheit AG",
@@ -111,6 +115,7 @@ object GuideContent {
             "Su división de seguridad interna, el Werkschutz, tenía el contrato exclusivo de Sektor V-7. Sus guardias " +
                 "estaban de servicio durante el incidente y hoy son asimilados.\n\n" +
                 "De Kessler vienen el revólver de Lukas y el punzón de descarga.",
+            image = R.drawable.gdd_kessler_guardia,
         ),
 
         // ---------- Lugares ----------
@@ -178,6 +183,7 @@ object GuideContent {
             "F la enciende y la apaga. Su carga dura ~120 s y se recarga sola tras ~3 s apagada.\n\n" +
                 "La luz duplica la velocidad de alerta de los enemigos que ilumina y activa a El Mudo. " +
                 "La Boca es ciega: la luz no le afecta.",
+            image = R.drawable.gdd_subtitulos_sonido,
         ),
         Article(
             34, MECHANIC, "Salud: Bien, Herido y Crítico",
@@ -185,6 +191,7 @@ object GuideContent {
             "Lukas pasa por tres estados visibles: Bien, Herido y Crítico. La salud no se regenera sola: solo la cura " +
                 "devuelve un estado.\n\n" +
                 "En Crítico el latido del laboratorio suena más fuerte.",
+            image = R.drawable.gdd_lukas_postura,
         ),
         Article(
             35, MECHANIC, "Hackeo por secuencias",
@@ -209,6 +216,7 @@ object GuideContent {
                 "El laboratorio se reacomoda: las salas cambian.\n\n" +
                 "Los documentos y el conocimiento persisten en el terminal del brazo. " +
                 "Cinco muertes seguidas llevan al final Asimilación.",
+            image = R.drawable.gdd_pausa_reiniciar,
         ),
         Article(
             38, MECHANIC, "Cierre de tránsito",
@@ -226,7 +234,7 @@ object GuideContent {
                 "clic izquierdo para disparar y R para recargar bala a bala.\n\n" +
                 "Solo dispara con una identidad autorizada. The Mother lo devuelve descargado tras cada reconstrucción. " +
                 "Los disparos alertan a ~20 m.",
-            image = R.drawable.gdd_objetos_inventario,
+            image = R.drawable.prop_revolver,
         ),
         Article(
             41, ITEM, "Punzón de descarga",
@@ -234,30 +242,35 @@ object GuideContent {
             "Equipo de contención de Kessler, de un solo uso. Se activa solo cuando un enemigo agarra a Lukas y lo aturde 2 s.\n\n" +
                 "También sirve para rematar: E sobre un cuerpo quema su último rastro de identidad y evita el reciclaje. " +
                 "Gastarlo así deja a Lukas sin defensa ante el próximo agarre.",
+            image = R.drawable.gdd_remate,
         ),
         Article(
             42, ITEM, "Cura",
             "Kit médico de Vitalis con un autoinyector dentro.",
             "Recupera un estado de salud. Se usa desde el inventario en ~1,5 s y un golpe durante la animación la cancela " +
                 "sin gastarla. Lleva la etiqueta en alemán Regenerationsmittel.",
+            image = R.drawable.prop_autoinyector,
         ),
         Article(
             43, ITEM, "Munición",
             "Blísteres de 4 cartuchos sin vaina.",
             "Cada casilla guarda hasta 12 balas, que son 3 blísteres. R carga bala a bala, ~0,7 s por bala. " +
                 "Se puede cancelar y se conservan las balas ya cargadas. Se pierde al morir.",
+            image = R.drawable.prop_municion,
         ),
         Article(
             44, ITEM, "Llaves de acceso",
             "Tarjetas de Vitalis: obligatorias y opcionales.",
             "Hay una llave obligatoria por piso: abre la sala final. Es una placa grande con banda cian e icono de escalera. " +
                 "Las opcionales, con banda gris, abren atajos o salas con recursos. Se gastan al usarlas.",
+            image = R.drawable.prop_tarjeta_acceso,
         ),
         Article(
             45, ITEM, "El anillo",
             "Lo único que Lukas sabe importante.",
             "Una alianza de acero gastada. La inscripción interior está raspada para que nunca se sepa de quién es. " +
                 "No ocupa casilla: queda como registro en el terminal del brazo.",
+            image = R.drawable.gdd_anillo,
         ),
         Article(
             46, ITEM, "Documentos",
@@ -275,6 +288,7 @@ object GuideContent {
             "El género suele apoyarse en conocer el mapa. Aquí, morir obliga a enfrentar un entorno en parte desconocido: " +
                 "las salas procedurales cambian y las salas clave cambian de posición.\n\n" +
                 "Identity Dissolution no es un shooter ni una fantasía de poder: Lukas nunca se vuelve mucho más fuerte.",
+            image = R.drawable.gdd_plano_piso1,
         ),
         Article(
             51, CONCEPT, "Los finales",
@@ -283,6 +297,7 @@ object GuideContent {
                 "Relevo básico: vencer a The Mother sin los 6 documentos de Emilia. Lukas la reemplaza sin recordar ningún nombre.\n\n" +
                 "Relevo completo y Ambiguo: con los 6 documentos, Lukas recupera los nombres y elige entre la terminal " +
                 "central y la salida.",
+            image = R.drawable.gdd_menu_principal,
         ),
     )
 }

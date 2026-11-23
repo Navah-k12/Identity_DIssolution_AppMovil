@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.identity_dissolution_appmovil.ui.theme.Identity_DIssolution_AppMovilTheme
 import androidx.compose.foundation.BorderStroke
@@ -104,10 +106,10 @@ fun SettingsContent(
     var dialog by remember { mutableStateOf<Pair<String, String>?>(null) }
 
     Column(Modifier.fillMaxSize()) {
-        ScreenHeader("Configuración del sistema")
+        ScreenHeader(tr("Configuración del sistema"))
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 4.dp)) {
 
-            SectionLabel("Visual y ambiente")
+            SectionLabel(tr("Visual y ambiente"))
             HorrorCard(Modifier.fillMaxWidth()) {
                 // Vista previa en vivo del glitch y del post-procesado.
                 Box(
@@ -117,18 +119,18 @@ fun SettingsContent(
                     GlitchText("SOBREVIVIR", style = TextStyle(fontFamily = BloodFont, fontSize = 30.sp, letterSpacing = 2.sp), color = BloodRed)
                 }
                 ToggleRow(
-                    "Efecto de glitch", s.glitchEffect, onGlitch,
-                    subtitle = "Distorsión en títulos y transiciones. Desactívalo si sientes mareo o fatiga visual.",
+                    tr("Efecto de glitch"), s.glitchEffect, onGlitch,
+                    subtitle = tr("Distorsión en títulos y transiciones. Desactívalo si sientes mareo o fatiga visual."),
                 )
                 Divider()
-                ToggleRow("Post-procesado retro", s.retroPostProcess, onRetro,
-                    subtitle = "Líneas de monitor antiguo sobre toda la app.")
+                ToggleRow(tr("Post-procesado retro"), s.retroPostProcess, onRetro,
+                    subtitle = tr("Líneas de monitor antiguo sobre toda la app."))
                 Divider()
                 IntensityRow(s.glitchIntensity, enabled = s.glitchEffect, onChange = onIntensity)
             }
 
             Spacer(Modifier.height(16.dp))
-            SectionLabel("Accesibilidad")
+            SectionLabel(tr("Accesibilidad"))
             HorrorCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp)) {
                     Text("Tamaño de texto", style = MaterialTheme.typography.bodyLarge)
@@ -158,32 +160,51 @@ fun SettingsContent(
             Spacer(Modifier.height(16.dp))
             SectionLabel("Preferencias")
             HorrorCard(Modifier.fillMaxWidth()) {
-                LinkRow("Idioma", value = s.language.uppercase(), onClick = onToggleLanguage)
+                LinkRow(tr("Idioma"), value = s.language.uppercase(), onClick = onToggleLanguage)
                 Divider()
-                ToggleRow("Sincronización automática", s.autoSync, onAutoSync)
+                ToggleRow(tr("Sincronización automática"), s.autoSync, onAutoSync)
                 Divider()
-                ToggleRow("Notificaciones de pulso", s.pulseNotifications, onPulse)
+                ToggleRow(tr("Notificaciones de pulso"), s.pulseNotifications, onPulse)
             }
 
             Spacer(Modifier.height(16.dp))
-            SectionLabel("Información")
+            SectionLabel(tr("Información"))
             HorrorCard(Modifier.fillMaxWidth()) {
-                LinkRow("Acerca de la app") {
-                    dialog = "Heartbeat Companion" to "Versión 1.0\nApp complementaria del videojuego de survival horror Heartbeat."
+                LinkRow(tr("Acerca de la app")) {
+                    dialog = "Identity Dissolution" to t("Versión 1.0\nApp complementaria del videojuego de survival horror Identity Dissolution.", "Version 1.0\nCompanion app for the survival horror game Identity Dissolution.")
                 }
                 Divider()
-                LinkRow("Licencias de código abierto") {
-                    dialog = "Licencias" to "Jetpack Compose, Navigation y Lifecycle: Apache License 2.0."
+                LinkRow(tr("Licencias de código abierto")) {
+                    dialog = tr("Licencias") to tr("Jetpack Compose, Navigation y Lifecycle: Apache License 2.0.")
                 }
                 Divider()
-                LinkRow("Política de privacidad") {
-                    dialog = "Privacidad" to "La app no recopila datos personales. Todo se guarda en tu dispositivo."
+                LinkRow(tr("Derechos de autor")) {
+                    dialog = tr("Derechos de autor") to t(
+                        "© 2026 Identity Dissolution. Todos los derechos reservados.\n\nIdentity Dissolution, sus personajes, monstruos, " +
+                            "modelos, imágenes y tráiler son propiedad de sus autores. Prohibida su copia o distribución sin permiso.",
+                        "© 2026 Identity Dissolution. All rights reserved.\n\nIdentity Dissolution, its characters, monsters, " +
+                            "models, images and trailer belong to their authors. Copying or distribution without permission is prohibited.",
+                    )
+                }
+                Divider()
+                LinkRow(tr("Equipo de desarrollo")) {
+                    dialog = tr("Equipo de desarrollo") to listOf(
+                        "Bryan Ivan Navarrete Canche",
+                        "Christian Coronel Palma",
+                        "Lian Daniel Sierra Vera",
+                        "Victor Gabriel Alvarado Chay",
+                        "Lenin Ramón López Córdova",
+                    ).joinToString("\n")
+                }
+                Divider()
+                LinkRow(tr("Política de privacidad")) {
+                    dialog = tr("Privacidad") to tr("La app no recopila datos personales. Todo se guarda en tu dispositivo.")
                 }
             }
 
             Spacer(Modifier.height(24.dp))
             OutlinedButton(
-                onClick = { dialog = "Datos borrados" to "Los ajustes volvieron a sus valores iniciales." ; onReset() },
+                onClick = { dialog = tr("Datos borrados") to tr("Los ajustes volvieron a sus valores iniciales.") ; onReset() },
                 border = BorderStroke(1.dp, DarkRed),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth().height(48.dp),

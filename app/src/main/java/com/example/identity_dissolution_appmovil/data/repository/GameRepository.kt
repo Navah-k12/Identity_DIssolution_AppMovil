@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.data.repository
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import com.example.identity_dissolution_appmovil.R
 import com.example.identity_dissolution_appmovil.model.Article
 import com.example.identity_dissolution_appmovil.model.ArticleCategory
@@ -61,7 +63,7 @@ object GameRepository {
         InventoryItem(3, "Aturdidor", "⚡", 1, "Arma cuerpo a cuerpo de la mano derecha. Aturde a los monstruos unos segundos. No funciona con El Mudo.", R.drawable.prop_aturdidor, "Arma"),
         InventoryItem(4, "Stunject", "🧪", 1, "Inyección aturdidora. Deja quieto a un monstruo si logras acercarte. No funciona con El Mudo.", R.drawable.prop_stunject, "Arma"),
         InventoryItem(5, "Munición", "📦", 12, "Balas para los revólveres. Se recargan bala a bala.", R.drawable.prop_municion, "Munición"),
-        InventoryItem(7, "Revólver", "🔫", 2, "Lukas lleva uno en cada mano. Su pantalla muestra las balas que quedan.", R.drawable.prop_revolver, "Arma"),
+        InventoryItem(7, "Revólver", "🔫", 1, "La única arma de Lukas. Su pantalla muestra las balas que quedan en el tambor de 6.", R.drawable.prop_revolver, "Arma"),
         InventoryItem(8, "Tarjeta de acceso", "💳", 1, "Abre las puertas electrónicas y las zonas restringidas.", R.drawable.prop_tarjeta_acceso, "Acceso"),
         InventoryItem(9, "Terminal", "📟", 1, "Terminal de brazo. Lukas lo consulta para leer registros y abrir sistemas.", R.drawable.prop_terminal, "Dispositivo"),
     )
@@ -102,11 +104,24 @@ object GameRepository {
         )),
     )
 
+    // Cronología real del GDD (03 - Historia y Mundo): Sektor V-7, 2080–2083.
     val story = listOf(
-        StoryEvent("1979", "La fundación", "Se inaugura el Hospital Central con un ala experimental en el norte."),
-        StoryEvent("1983", "El ritual", "El equipo del Dr. Varga intenta \"extirpar\" el miedo de sus pacientes."),
-        StoryEvent("1984", "El incidente", "Desaparece todo el turno nocturno. El hospital se cierra."),
-        StoryEvent("Hoy", "El regreso", "Despiertas en el sótano, sin recuerdos, con el pulso acelerado."),
+        StoryEvent("2080", "Vitalis Konzern", "La megacorporación de biotecnología opera el laboratorio de Sektor V-7. Vende algo que no entiende.",
+            tag = "CORPORACIÓN", image = R.drawable.gdd_menu_terminal),
+        StoryEvent("2080", "Emilia oye el latido", "Durante el turno de noche en la sala 4 del subnivel C, la científica Emilia Reiner-Hellen nota un sonido grave que se repite.",
+            date = "2080-11-02", tag = "DESCUBRIMIENTO", image = R.drawable.gdd_calibracion_latido),
+        StoryEvent("2081", "El incidente", "Alguien transmite el latido completo por la megafonía. Quien lo escucha queda asimilado. Nunca se confirma quién lo hizo.",
+            date = "2081-03-14 · 03:13", tag = "INCIDENTE", image = R.drawable.gdd_piso3, critical = true),
+        StoryEvent("2081", "Instalación sellada", "Vitalis cierra Sektor V-7 \"por mantenimiento programado\". Solo The Mother sigue activa.",
+            date = "2081-04-02", tag = "CIERRE", image = R.drawable.gdd_fila_capsulas),
+        StoryEvent("2082", "Emilia regresa", "Emilia vuelve una sola vez a la instalación sellada para saber qué es el latido. No sale.",
+            date = "2082-10-19 · 12:48", tag = "DESAPARICIÓN", image = R.drawable.gdd_terminal_documentos, critical = true),
+        StoryEvent("2083", "Expediente R-H", "The Mother la reconstruye una y otra vez: R-H-03 a R-H-06, de enero a noviembre. Cada reconstrucción alimenta al laboratorio.",
+            date = "2083-01-27 → 2083-11-18", tag = "SUJETOS", image = R.drawable.gdd_mother_fase2),
+        StoryEvent("2083", "El mensaje", "Lukas, solo en casa, recibe una nota de voz del diario de Emilia. De fondo suena el latido.",
+            date = "Diciembre 2083", tag = "SEÑAL", image = R.drawable.gdd_lukas_civil),
+        StoryEvent("Hoy", "Sujeto R-H-07", "Lukas entra con su acceso de técnico. The Mother lo registra como el séptimo sujeto.",
+            tag = "EN CURSO", image = R.drawable.gdd_lukas_r_h07, current = true),
     )
 
     val quotes = listOf(

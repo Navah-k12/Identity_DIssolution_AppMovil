@@ -1,5 +1,8 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
+import com.example.identity_dissolution_appmovil.ui.components.Lang
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -111,12 +114,12 @@ fun HomeScreen(onNavigate: (String) -> Unit, viewModel: HomeViewModel = viewMode
 /** Diseño sin ViewModel: así se puede ver en @Preview. */
 @Composable
 fun HomeContent(state: HomeUiState, onNavigate: (String) -> Unit) {
-    val quickAccess = remember(state.filesTotal) {
+    val quickAccess = remember(state.filesTotal, Lang.english) {
         listOf(
-            QuickAccess("Enciclopedia", "Mecánicas de juego", Icons.AutoMirrored.Outlined.MenuBook, Routes.ENCYCLOPEDIA, badge = "${state.filesTotal}"),
-            QuickAccess("Bestiario", "Amenazas registradas", Icons.Outlined.Visibility, Routes.BESTIARY, badge = "Nuevo", badgeIsNew = true),
-            QuickAccess("Controles", "Teclado y mando", Icons.Outlined.Keyboard, Routes.CONTROLS),
-            QuickAccess("Historia", "Cronología del lore", Icons.Outlined.History, Routes.HISTORY),
+            QuickAccess(tr("Enciclopedia"), "Mecánicas de juego", Icons.AutoMirrored.Outlined.MenuBook, Routes.ENCYCLOPEDIA, badge = "${state.filesTotal}"),
+            QuickAccess(tr("Bestiario"), "Amenazas registradas", Icons.Outlined.Visibility, Routes.BESTIARY),
+            QuickAccess(tr("Controles"), "Teclado y mando", Icons.Outlined.Keyboard, Routes.CONTROLS),
+            QuickAccess(tr("Historia"), "Cronología del lore", Icons.Outlined.History, Routes.HISTORY),
         )
     }
 
@@ -134,7 +137,7 @@ fun HomeContent(state: HomeUiState, onNavigate: (String) -> Unit) {
         Spacer(Modifier.height(20.dp))
         Row(verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f)) {
-                Eyebrow("// Sesión activa")
+                Eyebrow(tr("// Sesión activa"))
                 Spacer(Modifier.height(4.dp))
                 GlitchText(
                     "MISIÓN ACTUAL:\nSOBREVIVIR",
@@ -148,13 +151,13 @@ fun HomeContent(state: HomeUiState, onNavigate: (String) -> Unit) {
         EcgLine(bpm)
 
         Spacer(Modifier.height(20.dp))
-        Eyebrow("Continuar lectura")
+        Eyebrow(tr("Continuar lectura"))
         Spacer(Modifier.height(10.dp))
         state.reading?.let { ContinueCard(it) { onNavigate(it.route) } }
 
         Spacer(Modifier.height(24.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Eyebrow("Tráiler oficial", Modifier.weight(1f))
+            Eyebrow(tr("Tráiler oficial"), Modifier.weight(1f))
             TrailerDuration()
         }
         Spacer(Modifier.height(10.dp))
@@ -164,7 +167,7 @@ fun HomeContent(state: HomeUiState, onNavigate: (String) -> Unit) {
         FilesReadCard(state)
 
         Spacer(Modifier.height(24.dp))
-        Eyebrow("Accesos rápidos")
+        Eyebrow(tr("Accesos rápidos"))
         Spacer(Modifier.height(10.dp))
         // Rejilla 2x2 hecha con filas: así no anidamos un LazyGrid dentro de un scroll.
         quickAccess.chunked(2).forEach { row ->
@@ -324,7 +327,7 @@ private fun TrailerCard() {
 private fun FilesReadCard(state: HomeUiState) {
     HorrorCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
-            Eyebrow("Archivos leídos")
+            Eyebrow(tr("Archivos leídos"))
             Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.Bottom) {
                 Text("%02d".format(state.filesRead), style = MaterialTheme.typography.headlineSmall, color = BloodRed)
@@ -381,12 +384,12 @@ fun HomeScreenPreview() {
         HomeContent(
             state = HomeUiState(
                 reading = ContinueReading(
-                    "El incidente", "Guía · Lore · 4 min restantes",
+                    tr("El incidente"), "Guía · Lore · 4 min restantes",
                     imageRes = GameRepository.articles.first().image, progress = 0.62f,
                     route = Routes.article(1),
                 ),
                 filesRead = 7,
-                nextTitle = "El latido",
+                nextTitle = tr("El latido"),
             ),
             onNavigate = {},
         )

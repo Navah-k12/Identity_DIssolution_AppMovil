@@ -1,5 +1,26 @@
 package com.example.identity_dissolution_appmovil.ui.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.navigation.NavBackStackEntry
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -22,7 +43,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -81,8 +102,16 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
     Scaffold(
         containerColor = Background,
         bottomBar = {
-            if (selectedTab != null) {
-                BottomBar(selectedTab, guideBadge = newCount) { navController.navigateToTab(it.route) }
+            // La barra sube despacio al salir de la pantalla de carga, en vez de aparecer de golpe.
+            AnimatedVisibility(
+                visible = selectedTab != null,
+                enter = slideInVertically(tween(600, delayMillis = 250, easing = Emphasized)) { it } + fadeIn(tween(500, delayMillis = 250)),
+                exit = fadeOut(tween(150)),
+            ) {
+                // Durante la salida selectedTab ya es null: se recuerda la última pestaña.
+                var lastTab by remember { mutableStateOf(BottomTab.HOME) }
+                if (selectedTab != null) lastTab = selectedTab
+                BottomBar(lastTab, guideBadge = newCount) { navController.navigateToTab(it.route) }
             }
         },
     ) { padding ->
@@ -90,6 +119,13 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             navController = navController,
             startDestination = Routes.WELCOME,
             modifier = Modifier.padding(padding),
+            // Animación tipo Material "shared axis": al avanzar, la nueva pantalla entra deslizándose un poco
+            // desde la derecha mientras la vieja se aparta hacia la izquierda; al regresar, al revés.
+            // Entre pestañas de la barra inferior solo hay un fundido corto (no hay "adelante" ni "atrás").
+            enterTransition = { if (fromWelcome()) welcomeIn else if (isTabSwitch()) tabIn else slideFadeIn(forward = true) },
+            exitTransition = { if (fromWelcome()) welcomeOut else if (isTabSwitch()) tabOut else slideFadeOut(forward = true) },
+            popEnterTransition = { if (isTabSwitch()) tabIn else slideFadeIn(forward = false) },
+            popExitTransition = { if (isTabSwitch()) tabOut else slideFadeOut(forward = false) },
         ) {
             composable(Routes.WELCOME) {
                 Welcome(onStart = {
@@ -111,12 +147,12 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             ) { entry ->
                 ArticleDetailScreen(
                     articleId = entry.arguments?.getInt("id") ?: -1,
-                    onBack = { navController.popBackStack() },
+                    onBack = { navController.safePopBackStack() },
                 )
             }
             composable(Routes.BESTIARY) {
                 BestiaryScreen(
-                    onBack = { navController.popBackStack() },
+                    onBack = { navController.safePopBackStack() },
                     onMonsterClick = { navController.navigate(Routes.monster(it)) },
                 )
             }
@@ -126,7 +162,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             ) { entry ->
                 MonsterDetailScreen(
                     monsterId = entry.arguments?.getInt("id") ?: -1,
-                    onBack = { navController.popBackStack() },
+                    onBack = { navController.safePopBackStack() },
                     onSummon = { navController.navigate(Routes.ar(it)) },
                 )
             }
@@ -136,7 +172,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             ) {
                 // Model3DViewModel lee el "id" de la ruta con SavedStateHandle.
                 Model3DScreen(
-                    onBack = { navController.popBackStack() },
+                    onBack = { navController.safePopBackStack() },
                     onOpenAR = { navController.navigate(Routes.ar(it)) },
                 )
             }
@@ -145,13 +181,58 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 arguments = listOf(navArgument("id") { type = NavType.IntType }),
             ) {
                 // Reutiliza Model3DViewModel: también lee el "id" de la ruta.
-                ARScreen(onBack = { navController.popBackStack() })
+                ARScreen(onBack = { navController.safePopBackStack() })
             }
-            composable(Routes.CONTROLS) { ControlsScreen(onBack = { navController.popBackStack() }) }
-            composable(Routes.HISTORY) { HistoryScreen(onBack = { navController.popBackStack() }) }
+            composable(Routes.CONTROLS) { ControlsScreen(onBack = { navController.safePopBackStack() }) }
+            composable(Routes.HISTORY) { HistoryScreen(onBack = { navController.safePopBackStack() }) }
             composable(Routes.INVENTORY) { InventoryScreen() }
             composable(Routes.SETTINGS) { SettingsScreen() }
         }
+    }
+}
+
+// ---------- Transiciones ----------
+private const val NAV_MS = 320
+// Curva "emphasized" de Material 3: arranca rápido y frena suave, como un movimiento real.
+private val Emphasized = CubicBezierEasing(0.2f, 0f, 0f, 1f)
+private val tabRoutes = BottomTab.entries.map { it.route }.toSet() + Routes.WELCOME
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.fromWelcome() =
+    initialState.destination.route == Routes.WELCOME
+
+/**
+ * Pantalla de carga → Inicio: la carga se desvanece despacio y se acerca un poco, como si entraras en ella;
+ * Inicio aparece desde un poco más lejos. Más lento que el resto (700 ms) porque es la entrada a la app.
+ */
+private val welcomeOut = fadeOut(tween(550, easing = FastOutLinearInEasing)) +
+    scaleOut(tween(700, easing = Emphasized), targetScale = 1.08f)
+private val welcomeIn = fadeIn(tween(600, delayMillis = 200, easing = LinearOutSlowInEasing)) +
+    scaleIn(tween(800, delayMillis = 200, easing = Emphasized), initialScale = 0.94f)
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.isTabSwitch() =
+    initialState.destination.route in tabRoutes && targetState.destination.route in tabRoutes
+
+/** Entra desplazándose un 8 % del ancho y apareciendo. */
+private fun slideFadeIn(forward: Boolean): EnterTransition =
+    slideInHorizontally(tween(NAV_MS, easing = Emphasized)) { w -> if (forward) w / 12 else -w / 12 } +
+        fadeIn(tween(NAV_MS / 2, delayMillis = NAV_MS / 6, easing = LinearOutSlowInEasing))
+
+/** Sale desplazándose al lado contrario y desapareciendo rápido, para no encimarse con la nueva. */
+private fun slideFadeOut(forward: Boolean): ExitTransition =
+    slideOutHorizontally(tween(NAV_MS, easing = Emphasized)) { w -> if (forward) -w / 12 else w / 12 } +
+        fadeOut(tween(NAV_MS / 3, easing = FastOutLinearInEasing))
+
+private val tabIn = fadeIn(tween(220, delayMillis = 60)) + scaleIn(tween(220, delayMillis = 60), initialScale = 0.98f)
+private val tabOut = fadeOut(tween(90))
+
+/**
+ * Retrocede solo si la pantalla actual está activa. Mientras dura la animación de salida,
+ * la pantalla ya no está RESUMED, así que los toques repetidos se ignoran.
+ * Sin esto, varios toques sacaban también Inicio de la pila y el NavHost quedaba vacío (pantalla negra).
+ */
+private fun NavHostController.safePopBackStack() {
+    if (currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED && previousBackStackEntry != null) {
+        popBackStack()
     }
 }
 
@@ -186,7 +267,7 @@ private fun BottomBar(selected: BottomTab, guideBadge: Int, onSelect: (BottomTab
                                 .background(if (active) DarkRed.copy(alpha = 0.35f) else Surface, RoundedCornerShape(15.dp)),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Icon(tab.icon, tab.label, tint = if (active) BloodRed else TextMuted, modifier = Modifier.size(22.dp))
+                            Icon(tab.icon, tr(tab.label), tint = if (active) BloodRed else TextMuted, modifier = Modifier.size(22.dp))
                         }
                         if (tab == BottomTab.GUIDE && guideBadge > 0) {
                             Text(
@@ -202,7 +283,7 @@ private fun BottomBar(selected: BottomTab, guideBadge: Int, onSelect: (BottomTab
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        tab.label.uppercase(),
+                        tr(tab.label).uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         color = if (active) BloodRed else TextMuted,
                     )

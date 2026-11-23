@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.components
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Canvas
@@ -88,7 +90,7 @@ fun HorrorTopBar(
     }
 }
 
-/** Etiqueta pequeña de sección con barrita roja ("MOVIMIENTO", "PREFERENCIAS"...). */
+/** Etiqueta pequeña de sección con barrita roja (tr("MOVIMIENTO"), "PREFERENCIAS"...). */
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier) {
     Row(modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -161,13 +163,13 @@ fun CircleIconButton(icon: ImageVector, description: String, onClick: () -> Unit
     }
 }
 
-/** Etiqueta pequeña de sección en gris ("CONTINUAR LECTURA"). */
+/** Etiqueta pequeña de sección en gris (tr("CONTINUAR LECTURA")). */
 @Composable
 fun Eyebrow(text: String, modifier: Modifier = Modifier, color: Color = TextMuted) {
     Text(text.uppercase(), style = MaterialTheme.typography.labelMedium, color = color, modifier = modifier)
 }
 
-/** Pastilla de texto: "LORE", "ARMA", "DESTACADO", "NUEVO". */
+/** Pastilla de texto: tr("LORE"), "ARMA", "DESTACADO", "NUEVO". */
 @Composable
 fun Tag(text: String, filled: Boolean = false) {
     Text(

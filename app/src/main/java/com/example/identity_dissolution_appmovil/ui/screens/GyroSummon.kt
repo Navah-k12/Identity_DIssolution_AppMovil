@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -187,9 +189,9 @@ internal fun GyroSummon(enemy: Enemy, model: ByteBuffer? = null) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val hint = when {
-                now == null -> "Sin giroscopio: el monstruo quedará en el centro"
-                start == null -> "Apunta a donde quieras que aparezca"
-                offScreen -> "Sigue la flecha para encontrarlo"
+                now == null -> tr("Sin giroscopio: el monstruo quedará en el centro")
+                start == null -> tr("Apunta a donde quieras que aparezca")
+                offScreen -> tr("Sigue la flecha para encontrarlo")
                 else -> "¡${enemy.name} apareció! Gira el teléfono a su alrededor"
             }
             Text(
@@ -201,7 +203,7 @@ internal fun GyroSummon(enemy: Enemy, model: ByteBuffer? = null) {
                 Spacer(Modifier.height(16.dp))
                 SummonButton(
                     enabled = true,
-                    label = "INVOCAR MONSTRUO",
+                    label = tr("INVOCAR MONSTRUO"),
                     // Sin sensor se usa una dirección fija: el monstruo queda en el centro.
                     onClick = { summonAim = aim ?: Aim(0f, 0f, 0f) },
                 )
@@ -350,9 +352,9 @@ private fun GyroSummon3D(enemy: Enemy, buffer: ByteBuffer) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val hint = when {
-                aim == null -> "Sin giroscopio: el monstruo no seguirá el movimiento"
-                !summoned -> "Apunta a donde quieras que aparezca"
-                offDir != null -> "Sigue la flecha para encontrarlo"
+                aim == null -> tr("Sin giroscopio: el monstruo no seguirá el movimiento")
+                !summoned -> tr("Apunta a donde quieras que aparezca")
+                offDir != null -> tr("Sigue la flecha para encontrarlo")
                 else -> "¡${enemy.name} apareció! Gira el teléfono a su alrededor"
             }
             Text(
@@ -362,7 +364,7 @@ private fun GyroSummon3D(enemy: Enemy, buffer: ByteBuffer) {
             )
             if (!summoned) {
                 Spacer(Modifier.height(16.dp))
-                SummonButton(enabled = true, label = "INVOCAR MONSTRUO", onClick = { summon() })
+                SummonButton(enabled = true, label = tr("INVOCAR MONSTRUO"), onClick = { summon() })
             }
         }
     }

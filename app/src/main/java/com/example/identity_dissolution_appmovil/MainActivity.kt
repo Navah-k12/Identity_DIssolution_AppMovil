@@ -1,5 +1,6 @@
 package com.example.identity_dissolution_appmovil
 
+import com.example.identity_dissolution_appmovil.ui.components.Lang
 import android.os.Build
 import android.os.Bundle
 import coil3.ImageLoader
@@ -49,6 +50,8 @@ class MainActivity : ComponentActivity() {
             // Los ajustes se leen aquí arriba para aplicar los efectos a toda la app.
             val settingsViewModel: SettingsViewModel = viewModel()
             val settings by settingsViewModel.state.collectAsState()
+            // Idioma guardado en Ajustes: Lang.english es un estado de Compose, así que toda la app se redibuja.
+            Lang.english = settings.language == "English"
 
             Identity_DIssolution_AppMovilTheme {
                 // Tamaño de texto de Ajustes (A / A+ / A++) aplicado a toda la app.

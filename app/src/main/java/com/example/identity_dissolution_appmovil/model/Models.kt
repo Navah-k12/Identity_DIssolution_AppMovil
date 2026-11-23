@@ -52,7 +52,20 @@ data class ControlBinding(val key: String, val action: String)
 
 data class ControlSection(val title: String, val bindings: List<ControlBinding>)
 
-data class StoryEvent(val year: String, val title: String, val description: String)
+/**
+ * Evento de la cronología. [date] es la fecha exacta del GDD (o null), [tag] el tipo de registro,
+ * [critical] marca los momentos clave y [current] el presente (cuando empieza el juego).
+ */
+data class StoryEvent(
+    val year: String,
+    val title: String,
+    val description: String,
+    val date: String? = null,
+    val tag: String = "",
+    @DrawableRes val image: Int? = null,
+    val critical: Boolean = false,
+    val current: Boolean = false,
+)
 
 data class Settings(
     val glitchEffect: Boolean = true,

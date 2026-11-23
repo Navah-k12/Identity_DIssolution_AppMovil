@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -100,7 +102,7 @@ fun BestiaryContent(
 
     Column(Modifier.fillMaxSize()) {
         ScreenHeader(
-            "Bestiario",
+            tr("Bestiario"),
             leading = { CircleIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Volver", onBack) },
             trailing = {
                 Text("${monsters.size}", style = MaterialTheme.typography.titleLarge, color = TextMain)
@@ -121,14 +123,14 @@ fun BestiaryContent(
         ) {
             item(span = { GridItemSpan(2) }) {
                 Row {
-                    Eyebrow("Amenazas registradas", Modifier.weight(1f))
+                    Eyebrow(tr("Amenazas registradas"), Modifier.weight(1f))
                     Text("${monsters.size} criaturas", style = MaterialTheme.typography.labelMedium, color = TextMuted)
                 }
             }
             if (state.error != null && state.monsters.isEmpty()) {
                 item(span = { GridItemSpan(2) }) {
                     Text(
-                        "Sin conexión: mostrando registros guardados. Toca aquí para reintentar.",
+                        tr("Sin conexión: mostrando registros guardados. Toca aquí para reintentar."),
                         color = TextMuted, style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.clickable(onClick = onRetry),
                     )
@@ -187,7 +189,7 @@ fun MonsterDetailScreen(
     viewModel: BestiaryViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
-    // Abrir un monstruo lo guarda como "última lectura" para Inicio.
+    // Abrir un monstruo lo guarda como tr("última lectura") para Inicio.
     LaunchedEffect(monsterId) { viewModel.markRead(monsterId) }
     val enemy = state.monsters.find { it.id == monsterId } ?: GameRepository.enemies.find { it.id == monsterId }
     MonsterDetailContent(enemy, onBack, onSummon)
@@ -197,7 +199,7 @@ fun MonsterDetailScreen(
 fun MonsterDetailContent(enemy: Enemy?, onBack: () -> Unit, onSummon: (Int) -> Unit) {
     Column(Modifier.fillMaxSize()) {
         ScreenHeader(
-            enemy?.name ?: "Registro",
+            enemy?.name ?: tr("Registro"),
             leading = { CircleIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Volver", onBack) },
         )
         if (enemy == null) {
@@ -218,12 +220,12 @@ fun MonsterDetailContent(enemy: Enemy?, onBack: () -> Unit, onSummon: (Int) -> U
 
             Spacer(Modifier.height(20.dp))
             Row {
-                StatBar("Peligro", enemy.danger, Modifier.weight(1f))
+                StatBar(tr("Peligro"), enemy.danger, Modifier.weight(1f))
                 Spacer(Modifier.size(16.dp))
-                StatBar("Velocidad", enemy.speed, Modifier.weight(1f))
+                StatBar(tr("Velocidad"), enemy.speed, Modifier.weight(1f))
             }
-            InfoBlock("Comportamiento", enemy.behavior)
-            InfoBlock("Estrategia", enemy.strategy)
+            InfoBlock(tr("Comportamiento"), enemy.behavior)
+            InfoBlock(tr("Estrategia"), enemy.strategy)
 
             Spacer(Modifier.height(20.dp))
             Button(
@@ -244,7 +246,7 @@ fun MonsterDetailContent(enemy: Enemy?, onBack: () -> Unit, onSummon: (Int) -> U
             }
             Spacer(Modifier.height(16.dp))
             Text(
-                "ARCHIVO INCOMPLETO... ENCUENTRA MÁS INFORMACIÓN EN EL JUEGO.",
+                tr("ARCHIVO INCOMPLETO... ENCUENTRA MÁS INFORMACIÓN EN EL JUEGO."),
                 color = TextMuted, fontFamily = HorrorFont, fontStyle = FontStyle.Italic,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),

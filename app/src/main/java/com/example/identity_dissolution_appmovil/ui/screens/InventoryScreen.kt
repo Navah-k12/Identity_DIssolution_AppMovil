@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -71,7 +73,7 @@ fun InventoryContent(state: InventoryUiState, onSelect: (InventoryItem?) -> Unit
     val free = state.totalSlots - used
 
     Column(Modifier.fillMaxSize()) {
-        ScreenHeader("Inventario crítico", trailing = {
+        ScreenHeader(tr("Inventario crítico"), trailing = {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text("$used", style = MaterialTheme.typography.titleLarge, color = TextMain)
                 Text("/${state.totalSlots}", style = MaterialTheme.typography.bodyLarge, color = TextMuted, fontFamily = HorrorFont)
@@ -80,7 +82,7 @@ fun InventoryContent(state: InventoryUiState, onSelect: (InventoryItem?) -> Unit
         Column(Modifier.padding(horizontal = 20.dp)) {
             SegmentedProgress(used, state.totalSlots, height = 5, gap = 6)
             Spacer(Modifier.height(8.dp))
-            Eyebrow(if (free == 1) "1 espacio libre" else "$free espacios libres")
+            Eyebrow(if (free == 1) tr("1 espacio libre") else t("$free espacios libres", "$free free slots"))
         }
 
         LazyVerticalGrid(
@@ -119,7 +121,7 @@ private fun Slot(item: InventoryItem, selected: Boolean, onClick: () -> Unit) {
         if (item.image != null) {
             Image(
                 painter = painterResource(item.image),
-                contentDescription = item.name,
+                contentDescription = tr(item.name),
                 modifier = Modifier.fillMaxWidth().aspectRatio(1.3f).padding(start = 10.dp, end = 10.dp, top = 14.dp),
             )
         } else {
@@ -136,7 +138,7 @@ private fun Slot(item: InventoryItem, selected: Boolean, onClick: () -> Unit) {
                 .padding(horizontal = 5.dp, vertical = 1.dp),
         )
         Text(
-            item.name,
+            tr(item.name),
             style = MaterialTheme.typography.bodySmall,
             color = TextMain,
             maxLines = 1,
@@ -192,24 +194,24 @@ private fun DetailSheet(item: InventoryItem) {
                 contentAlignment = Alignment.Center,
             ) {
                 if (item.image != null) {
-                    Image(painterResource(item.image), item.name, Modifier.padding(6.dp))
+                    Image(painterResource(item.image), tr(item.name), Modifier.padding(6.dp))
                 } else {
                     Text(item.emoji, fontSize = 28.sp)
                 }
             }
             Spacer(Modifier.width(14.dp))
             Column {
-                Text(item.name, style = MaterialTheme.typography.titleLarge, color = TextMain, fontWeight = FontWeight.Bold)
+                Text(tr(item.name), style = MaterialTheme.typography.titleLarge, color = TextMain, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Tag(item.type)
                     Spacer(Modifier.width(8.dp))
-                    Text("Cantidad x${item.quantity}", style = MaterialTheme.typography.labelMedium, color = TextMuted)
+                    Text(t("Cantidad x${item.quantity}", "Quantity x${item.quantity}"), style = MaterialTheme.typography.labelMedium, color = TextMuted)
                 }
             }
         }
         Spacer(Modifier.height(14.dp))
-        Text(item.description, style = MaterialTheme.typography.bodyMedium, color = TextMain)
+        Text(tr(item.description), style = MaterialTheme.typography.bodyMedium, color = TextMain)
     }
 }
 

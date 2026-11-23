@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.identity_dissolution_appmovil.ui.theme.Identity_DIssolution_AppMovilTheme
 import androidx.compose.foundation.BorderStroke
@@ -50,7 +52,7 @@ fun ControlsScreen(onBack: () -> Unit) {
     val sections = if (selectedTab == 0) GameRepository.keyboardControls else GameRepository.gamepadControls
 
     Column(Modifier.fillMaxSize()) {
-        HorrorTopBar("Controles", onBack = onBack)
+        HorrorTopBar(tr("Controles"), onBack = onBack)
 
         Row(
             Modifier
@@ -59,7 +61,7 @@ fun ControlsScreen(onBack: () -> Unit) {
                 .background(SurfaceColor, RoundedCornerShape(10.dp))
                 .padding(4.dp),
         ) {
-            listOf("Teclado", "Mando").forEachIndexed { index, label ->
+            listOf(tr("Teclado"), "Mando").forEachIndexed { index, label ->
                 val selected = index == selectedTab
                 Box(
                     Modifier
@@ -95,7 +97,7 @@ fun ControlsScreen(onBack: () -> Unit) {
 @Composable
 private fun BindingRow(binding: ControlBinding) {
     Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        // Cada tecla se dibuja como una "tecla física".
+        // Cada tecla se dibuja como una tr("tecla física").
         Row {
             binding.key.split(" ").forEach { key ->
                 Surface(

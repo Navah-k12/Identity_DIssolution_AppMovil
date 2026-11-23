@@ -1,8 +1,11 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Animatable
@@ -102,7 +105,7 @@ import java.nio.ByteBuffer
 private enum class ArSupport { CHECKING, SUPPORTED, UNSUPPORTED }
 
 /**
- * "Invocar monstruo": como en Pokémon GO, el monstruo aparece en tu mundo real a través de la cámara.
+ * tr("Invocar monstruo"): como en Pokémon GO, el monstruo aparece en tu mundo real a través de la cámara.
  * - Con ARCore: se coloca sobre el piso detectado. Usa el modelo 3D si existe; si no, su figura recortada.
  * - Sin ARCore: cámara normal + giroscopio (AR clásico, ver GyroSummon.kt).
  * - Sin permiso de cámara: modo sin AR, con el monstruo sobre un fondo del laboratorio.
@@ -142,8 +145,20 @@ fun ARScreen(onBack: () -> Unit, viewModel: Model3DViewModel = viewModel()) {
         if (support != ArSupport.CHECKING && !hasCamera) launcher.launch(Manifest.permission.CAMERA)
     }
 
+    // Al salir se deja de dibujar la cámara y la escena 3D ANTES de la animación de salida.
+    // Sus SurfaceView se dibujan encima de todo, así que si siguen vivos tapan el Bestiario un momento.
+    var leaving by remember { mutableStateOf(false) }
+    val exit = {
+        if (!leaving) {
+            leaving = true
+            onBack()
+        }
+    }
+    BackHandler(onBack = exit)
+
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         when {
+            leaving -> Unit
             enemy == null || support == ArSupport.CHECKING ->
                 CircularProgressIndicator(color = BloodRed, modifier = Modifier.align(Alignment.Center))
             // Sin ARCore: cámara normal + giroscopio. Sin permiso de cámara: modo sin AR.
@@ -162,7 +177,7 @@ fun ARScreen(onBack: () -> Unit, viewModel: Model3DViewModel = viewModel()) {
             Modifier.fillMaxWidth().statusBarsPadding().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CircleIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Volver", onBack)
+            CircleIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Volver", exit)
             Spacer(Modifier.width(12.dp))
             Column {
                 Text("INVOCACIÓN", style = MaterialTheme.typography.labelSmall, color = SoftRed)
@@ -183,7 +198,7 @@ private fun CameraPermission(onAsk: () -> Unit) {
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
     ) {
         Text(
-            "Necesitamos la cámara para invocar al monstruo en tu mundo.",
+            tr("Necesitamos la cámara para invocar al monstruo en tu mundo."),
             color = TextMuted, textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(16.dp))
@@ -255,7 +270,7 @@ private fun ArSummon(enemy: Enemy, buffer: ByteBuffer?) {
     var viewSize by remember { mutableStateOf(IntSize.Zero) }
     var floorFound by remember { mutableStateOf(false) }
     var summoned by remember { mutableStateOf(false) }
-    var hint by remember { mutableStateOf("Apunta al piso y mueve el teléfono despacio…") }
+    var hint by remember { mutableStateOf(tr("Apunta al piso y mueve el teléfono despacio…")) }
     // Figura que mira siempre a la cámara (solo si no hay modelo 3D).
     var billboard by remember { mutableStateOf<Node?>(null) }
     // Animación de aparición: el monstruo crece desde el piso.
@@ -325,7 +340,7 @@ private fun ArSummon(enemy: Enemy, buffer: ByteBuffer?) {
                 if (!floorFound) {
                     floorFound = updatedFrame.getUpdatedTrackables(Plane::class.java)
                         .any { it.type == Plane.Type.HORIZONTAL_UPWARD_FACING }
-                    if (floorFound) hint = "Piso detectado: apunta la mira e invoca"
+                    if (floorFound) hint = tr("Piso detectado: apunta la mira e invoca")
                 }
                 // Aparición: crece en 0.7 s con un pequeño rebote.
                 monsterNode?.let { node ->
@@ -345,7 +360,7 @@ private fun ArSummon(enemy: Enemy, buffer: ByteBuffer?) {
             },
             onTrackingFailureChanged = { reason ->
                 if (reason != null && reason != TrackingFailureReason.NONE) {
-                    hint = "Busca más luz o mueve el teléfono más despacio"
+                    hint = tr("Busca más luz o mueve el teléfono más despacio")
                 }
             },
             onGestureListener = rememberOnGestureListener(
@@ -368,10 +383,10 @@ private fun ArSummon(enemy: Enemy, buffer: ByteBuffer?) {
             if (!summoned) {
                 SummonButton(
                     enabled = floorFound,
-                    label = "INVOCAR MONSTRUO",
+                    label = tr("INVOCAR MONSTRUO"),
                     onClick = {
                         if (!summonAt(viewSize.width / 2f, viewSize.height / 2f)) {
-                            hint = "No hay piso en la mira. Apunta a una zona detectada"
+                            hint = tr("No hay piso en la mira. Apunta a una zona detectada")
                         }
                     },
                 )
@@ -381,7 +396,7 @@ private fun ArSummon(enemy: Enemy, buffer: ByteBuffer?) {
 }
 
 // -------------------------------------------------------------------------------------------
-// Sin ARCore: modo sin AR (como Pokémon GO con "RA desactivada").
+// Sin ARCore: modo sin AR (como Pokémon GO con tr("RA desactivada")).
 // -------------------------------------------------------------------------------------------
 
 @Composable
@@ -399,7 +414,7 @@ private fun NoArSummon(enemy: Enemy) {
     val art = GameRepository.monsterArt[enemy.id]
 
     Box(Modifier.fillMaxSize()) {
-        // Fondo: la propia escena del monstruo, oscurecida, como su "hábitat".
+        // Fondo: la propia escena del monstruo, oscurecida, como su tr("hábitat").
         if (art != null) {
             Image(
                 painterResource(art), null, contentScale = ContentScale.Crop,
@@ -457,14 +472,14 @@ private fun NoArSummon(enemy: Enemy) {
                 Spacer(Modifier.height(12.dp))
             }
             Text(
-                "Sin permiso de cámara: modo sin AR.",
+                tr("Sin permiso de cámara: modo sin AR."),
                 color = TextMuted, fontFamily = HorrorFont, textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(8.dp)).padding(10.dp),
             )
             if (!summoned) {
                 Spacer(Modifier.height(16.dp))
-                SummonButton(enabled = true, label = "INVOCAR MONSTRUO", onClick = { summoned = true })
+                SummonButton(enabled = true, label = tr("INVOCAR MONSTRUO"), onClick = { summoned = true })
             }
         }
     }

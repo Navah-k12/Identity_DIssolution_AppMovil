@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -145,10 +147,10 @@ fun EncyclopediaContent(
     val list = results.filter { it != featured }
 
     Column(Modifier.fillMaxSize()) {
-        ScreenHeader("Registros de sangre", trailing = {
+        ScreenHeader(tr("Registros de sangre"), trailing = {
             CircleIconButton(
                 if (onlyBookmarks) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                "Ver guardados", onToggleOnlyBookmarks,
+                tr("Ver guardados"), onToggleOnlyBookmarks,
             )
         })
 
@@ -165,7 +167,7 @@ fun EncyclopediaContent(
             }
             item {
                 Row(Modifier.padding(top = 8.dp)) {
-                    Eyebrow(if (onlyBookmarks) "Guardados" else "Archivos", Modifier.weight(1f))
+                    Eyebrow(if (onlyBookmarks) tr("Guardados") else tr("Archivos"), Modifier.weight(1f))
                     Text("${list.size} registros", style = MaterialTheme.typography.labelMedium, color = TextMuted)
                 }
             }
@@ -223,7 +225,7 @@ private fun CategoryChips(selected: ArticleCategory?, onSelect: (ArticleCategory
         items(options) { cat ->
             val active = cat == selected
             Text(
-                cat?.label ?: "Todo",
+                cat?.label ?: tr("Todo"),
                 fontFamily = HorrorFont,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyMedium,
@@ -261,7 +263,7 @@ private fun FeaturedCard(article: Article, progress: Float, onClick: () -> Unit)
         Box(Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Transparent, Background.copy(alpha = 0.9f)))))
         Column(Modifier.padding(16.dp)) {
             Spacer(Modifier.height(24.dp))
-            Tag("Destacado", filled = true)
+            Tag(tr("Destacado"), filled = true)
             Spacer(Modifier.height(8.dp))
             Text(article.title.uppercase(), color = BloodRed, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(6.dp))
@@ -280,7 +282,7 @@ private fun FeaturedCard(article: Article, progress: Float, onClick: () -> Unit)
                     colors = ButtonDefaults.buttonColors(containerColor = BloodRed, contentColor = OnRed),
                     modifier = Modifier.height(44.dp),
                 ) {
-                    Text(if (progress > 0f) "CONTINUAR" else "LEER", fontFamily = HorrorFont, fontWeight = FontWeight.Bold)
+                    Text(if (progress > 0f) tr("CONTINUAR") else tr("LEER"), fontFamily = HorrorFont, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -329,7 +331,7 @@ private fun ArticleRow(
             }
             Icon(
                 if (bookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                if (bookmarked) "Quitar marcador" else "Guardar",
+                if (bookmarked) tr("Quitar marcador") else tr("Guardar"),
                 tint = if (bookmarked) BloodRed else TextMuted,
                 modifier = Modifier.clip(CircleShape).clickable(onClick = onBookmark).padding(4.dp).size(22.dp),
             )
@@ -337,7 +339,7 @@ private fun ArticleRow(
     }
 }
 
-/** "● NUEVO", "✓ LEÍDO" o el porcentaje leído. */
+/** tr("● NUEVO"), "✓ LEÍDO" o el porcentaje leído. */
 @Composable
 private fun ReadStatus(article: Article, progress: Float?) {
     val style = MaterialTheme.typography.labelSmall
@@ -366,7 +368,7 @@ fun ArticleDetailScreen(
     val context = LocalContext.current
     val reading = remember { ReadingRepository.get(context) }
     val scroll = rememberScrollState()
-    // Abrir un artículo lo guarda como "última lectura" para Inicio.
+    // Abrir un artículo lo guarda como tr("última lectura") para Inicio.
     LaunchedEffect(articleId) { reading.save(LastRead.Guide(articleId)) }
     // Guarda hasta dónde se bajó: eso es el progreso de lectura.
     LaunchedEffect(articleId, scroll) {
@@ -385,7 +387,7 @@ fun ArticleDetailContent(
 ) {
     Column(Modifier.fillMaxSize()) {
         ScreenHeader(
-            article?.category?.label ?: "Archivo",
+            article?.category?.label ?: tr("Archivo"),
             leading = { CircleIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Volver", onBack) },
         )
         Column(Modifier.verticalScroll(scroll).padding(horizontal = 20.dp, vertical = 8.dp)) {

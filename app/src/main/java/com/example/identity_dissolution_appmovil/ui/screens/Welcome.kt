@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import com.example.identity_dissolution_appmovil.ui.components.tr
+import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -92,7 +94,7 @@ fun Welcome(onStart: () -> Unit) {
         }
     }
     val loaded = progress >= 1f
-    val status = if (loaded) "IDENTIDAD RESTAURADA" else steps.last { progress >= it.first }.second
+    val status = tr(if (loaded) "IDENTIDAD RESTAURADA" else steps.last { progress >= it.first }.second)
 
     // "Toca para entrar" parpadea cuando la carga termina.
     val blink by rememberInfiniteTransition(label = "blink").animateFloat(
@@ -157,7 +159,7 @@ fun Welcome(onStart: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.width(28.dp).height(1.dp).background(TextMuted.copy(alpha = 0.4f)))
                 Text(
-                    "ARCHIVOS DE VITALIS", color = TextMuted, fontFamily = HorrorFont, fontSize = 11.sp,
+                    tr("ARCHIVOS DE VITALIS"), color = TextMuted, fontFamily = HorrorFont, fontSize = 11.sp,
                     letterSpacing = 3.sp, modifier = Modifier.padding(horizontal = 12.dp),
                 )
                 Box(Modifier.width(28.dp).height(1.dp).background(TextMuted.copy(alpha = 0.4f)))
@@ -179,7 +181,7 @@ fun Welcome(onStart: () -> Unit) {
             }
             Spacer(Modifier.height(24.dp))
             Text(
-                if (loaded) "v1.0 · TOCA PARA ENTRAR" else "v1.0",
+                if (loaded) tr("v1.0 · TOCA PARA ENTRAR") else "v1.0",
                 color = TextMuted, fontFamily = HorrorFont, fontSize = 10.sp, letterSpacing = 2.sp,
                 modifier = Modifier.align(Alignment.CenterHorizontally).alpha(if (loaded) blink else 0.6f),
             )
