@@ -63,7 +63,7 @@ import com.example.identity_dissolution_appmovil.ui.theme.Identity_DIssolution_A
 import com.example.identity_dissolution_appmovil.ui.theme.TextMain
 import com.example.identity_dissolution_appmovil.ui.theme.TextMuted
 
-private val CardBg = Color(0xFF141011)
+private val CardBg get() = com.example.identity_dissolution_appmovil.ui.theme.Surface
 private val LineX = 22.dp
 
 /**

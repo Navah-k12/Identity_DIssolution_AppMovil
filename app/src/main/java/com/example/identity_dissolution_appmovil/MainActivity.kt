@@ -1,5 +1,7 @@
 package com.example.identity_dissolution_appmovil
 
+import androidx.compose.runtime.LaunchedEffect
+import com.example.identity_dissolution_appmovil.ui.theme.AppTheme
 import com.example.identity_dissolution_appmovil.ui.components.Lang
 import android.os.Build
 import android.os.Bundle
@@ -52,6 +54,13 @@ class MainActivity : ComponentActivity() {
             val settings by settingsViewModel.state.collectAsState()
             // Idioma guardado en Ajustes: Lang.english es un estado de Compose, así que toda la app se redibuja.
             Lang.english = settings.language == "English"
+            AppTheme.light = settings.lightTheme
+            // Iconos de la barra de estado oscuros en el tema claro, blancos en el oscuro.
+            LaunchedEffect(settings.lightTheme) {
+                val t = android.graphics.Color.TRANSPARENT
+                val style = if (settings.lightTheme) SystemBarStyle.light(t, t) else SystemBarStyle.dark(t)
+                enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+            }
 
             Identity_DIssolution_AppMovilTheme {
                 // Tamaño de texto de Ajustes (A / A+ / A++) aplicado a toda la app.

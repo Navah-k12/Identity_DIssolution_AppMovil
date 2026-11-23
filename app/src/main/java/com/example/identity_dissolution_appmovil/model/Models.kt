@@ -71,6 +71,7 @@ data class Settings(
     val glitchEffect: Boolean = true,
     val retroPostProcess: Boolean = false,
     val language: String = "Español",
+    val lightTheme: Boolean = false,
     val autoSync: Boolean = true,
     val pulseNotifications: Boolean = true,
     /** 0f..1f: cuánto se desplaza el texto con el glitch. */

@@ -1,26 +1,49 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
+import com.example.identity_dissolution_appmovil.viewmodel.AuthViewModel
+import com.example.identity_dissolution_appmovil.viewmodel.AuthUiState
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
 import com.example.identity_dissolution_appmovil.ui.components.tr
 import com.example.identity_dissolution_appmovil.ui.components.t
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.identity_dissolution_appmovil.ui.theme.Identity_DIssolution_AppMovilTheme
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.sp
 import com.example.identity_dissolution_appmovil.R
 import com.example.identity_dissolution_appmovil.ui.components.GlitchText
 import com.example.identity_dissolution_appmovil.ui.components.ScreenHeader
@@ -29,7 +52,6 @@ import com.example.identity_dissolution_appmovil.ui.theme.Background
 import com.example.identity_dissolution_appmovil.ui.theme.HorrorFont
 import com.example.identity_dissolution_appmovil.ui.theme.OnRed
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,24 +60,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -75,10 +92,16 @@ import com.example.identity_dissolution_appmovil.viewmodel.SettingsViewModel
 private val BloodFont = FontFamily(Font(R.font.rubik_wet_paint))
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
+fun SettingsScreen(viewModel: SettingsViewModel = viewModel(), authViewModel: AuthViewModel = viewModel()) {
     val s by viewModel.state.collectAsState()
+    val auth by authViewModel.state.collectAsState()
     SettingsContent(
         s = s,
+        onLightTheme = viewModel::setLightTheme,
+        account = {
+            val context = LocalContext.current
+            AccountCard(auth, authViewModel::signIn, authViewModel::register, { authViewModel.signInWithGoogle(context) }, authViewModel::signOut, authViewModel::clearError)
+        },
         onGlitch = viewModel::setGlitch,
         onRetro = viewModel::setRetro,
         onToggleLanguage = viewModel::toggleLanguage,
@@ -95,6 +118,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 fun SettingsContent(
     s: Settings,
     onGlitch: (Boolean) -> Unit = {},
+    onLightTheme: (Boolean) -> Unit = {},
+    account: @Composable () -> Unit = {},
     onRetro: (Boolean) -> Unit = {},
     onToggleLanguage: () -> Unit = {},
     onAutoSync: (Boolean) -> Unit = {},
@@ -109,6 +134,10 @@ fun SettingsContent(
         ScreenHeader(tr("Configuración del sistema"))
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 4.dp)) {
 
+            SectionLabel(tr("Cuenta"))
+            account()
+
+            Spacer(Modifier.height(16.dp))
             SectionLabel(tr("Visual y ambiente"))
             HorrorCard(Modifier.fillMaxWidth()) {
                 // Vista previa en vivo del glitch y del post-procesado.
@@ -122,6 +151,9 @@ fun SettingsContent(
                     tr("Efecto de glitch"), s.glitchEffect, onGlitch,
                     subtitle = tr("Distorsión en títulos y transiciones. Desactívalo si sientes mareo o fatiga visual."),
                 )
+                Divider()
+                ToggleRow(tr("Tema claro"), s.lightTheme, onLightTheme,
+                    subtitle = tr("Papel clínico y carmesí de Vitalis. Los colores salen de las paletas del juego."))
                 Divider()
                 ToggleRow(tr("Post-procesado retro"), s.retroPostProcess, onRetro,
                     subtitle = tr("Líneas de monitor antiguo sobre toda la app."))
@@ -295,4 +327,109 @@ private fun LinkRow(title: String, value: String? = null, onClick: () -> Unit) {
 @Composable
 fun SettingsScreenPreview() {
     Identity_DIssolution_AppMovilTheme { SettingsContent(s = Settings()) }
+}
+
+
+/**
+ * Cuenta con Firebase: si no hay sesión, formulario de correo y contraseña
+ * (iniciar sesión o crear cuenta); si la hay, el correo y "Cerrar sesión".
+ */
+@Composable
+private fun AccountCard(
+    auth: AuthUiState,
+    onSignIn: (String, String) -> Unit,
+    onRegister: (String, String) -> Unit,
+    onGoogle: () -> Unit,
+    onSignOut: () -> Unit,
+    onClearError: () -> Unit,
+) {
+    HorrorCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
+            when {
+                !auth.available -> Text(
+                    t("Firebase no está configurado: falta app/google-services.json.",
+                        "Firebase is not configured: app/google-services.json is missing."),
+                    color = TextMuted, style = MaterialTheme.typography.bodyMedium,
+                )
+                auth.email != null -> {
+                    Text(t("Sesión iniciada", "Signed in"), style = MaterialTheme.typography.labelMedium, color = BloodRed)
+                    Spacer(Modifier.height(4.dp))
+                    Text(auth.email, style = MaterialTheme.typography.bodyLarge, color = TextMain)
+                    Spacer(Modifier.height(12.dp))
+                    TextButton(onClick = onSignOut) { Text(t("CERRAR SESIÓN", "SIGN OUT"), color = BloodRed, fontWeight = FontWeight.Bold) }
+                }
+                else -> {
+                    var email by remember { mutableStateOf("") }
+                    var password by remember { mutableStateOf("") }
+                    var showPassword by remember { mutableStateOf(false) }
+                    val fieldColors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = BloodRed, unfocusedBorderColor = Border, cursorColor = BloodRed,
+                        focusedLabelColor = BloodRed, unfocusedLabelColor = TextMuted,
+                        focusedTextColor = TextMain, unfocusedTextColor = TextMain,
+                    )
+                    Text(t("Inicia sesión para guardar tu progreso", "Sign in to save your progress"),
+                        style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedTextField(
+                        email, { email = it; onClearError() }, label = { Text(t("Correo", "Email")) }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        colors = fieldColors, modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        password, { password = it; onClearError() }, label = { Text(t("Contraseña", "Password")) }, singleLine = true,
+                        // Ojo para mostrar u ocultar la contraseña.
+                        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { showPassword = !showPassword }) {
+                                Icon(
+                                    if (showPassword) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                                    contentDescription = if (showPassword) t("Ocultar contraseña", "Hide password") else t("Mostrar contraseña", "Show password"),
+                                    tint = TextMuted,
+                                )
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        colors = fieldColors, modifier = Modifier.fillMaxWidth(),
+                    )
+                    auth.error?.let {
+                        Spacer(Modifier.height(8.dp))
+                        Text(it, color = BloodRed, style = MaterialTheme.typography.bodySmall)
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    if (auth.loading) {
+                        CircularProgressIndicator(color = BloodRed, modifier = Modifier.size(28.dp))
+                    } else {
+                        Row {
+                            Button(
+                                onClick = { onSignIn(email, password) },
+                                colors = ButtonDefaults.buttonColors(containerColor = DarkRed, contentColor = Color.White),
+                            ) { Text(t("INICIAR SESIÓN", "SIGN IN"), fontWeight = FontWeight.Bold) }
+                            Spacer(Modifier.width(8.dp))
+                            TextButton(onClick = { onRegister(email, password) }) {
+                                Text(t("CREAR CUENTA", "SIGN UP"), color = BloodRed, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        // Separador "o".
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.weight(1f).height(1.dp).background(Border))
+                            Text(t("o", "or"), color = TextMuted, modifier = Modifier.padding(horizontal = 12.dp))
+                            Box(Modifier.weight(1f).height(1.dp).background(Border))
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        OutlinedButton(
+                            onClick = onGoogle,
+                            border = BorderStroke(1.dp, Border),
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                        ) {
+                            Text("G", color = BloodRed, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                            Spacer(Modifier.width(10.dp))
+                            Text(t("CONTINUAR CON GOOGLE", "CONTINUE WITH GOOGLE"), color = TextMain, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

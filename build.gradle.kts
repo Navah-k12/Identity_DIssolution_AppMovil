@@ -4,4 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false
+    // Google Services (Firebase). Se escribe con id directo, como en la guía de Firebase.
+    id("com.google.gms.google-services") version "4.6.0" apply false
 }

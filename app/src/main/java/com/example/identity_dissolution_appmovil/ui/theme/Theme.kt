@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-private val HeartbeatColors = darkColorScheme(
+// Se crea en cada composición: los colores dependen de AppTheme.light.
+// Se parte del esquema claro u oscuro de Material y se reemplazan los colores con los nuestros.
+private fun colors() = (if (AppTheme.light) lightColorScheme() else darkColorScheme()).copy(
     primary = BloodRed,
     onPrimary = OnRed,
     primaryContainer = DarkRed,
@@ -21,11 +24,11 @@ private val HeartbeatColors = darkColorScheme(
     outline = Border,
 )
 
-// La app siempre usa el tema oscuro de terror (sin colores dinámicos del sistema).
+// Tema oscuro de terror o tema claro con las paletas del juego (Ajustes). Sin colores dinámicos del sistema.
 @Composable
 fun Identity_DIssolution_AppMovilTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = HeartbeatColors,
+        colorScheme = colors(),
         typography = Typography,
     ) {
         // Fondo negro y texto claro para TODO lo que esté dentro del tema:

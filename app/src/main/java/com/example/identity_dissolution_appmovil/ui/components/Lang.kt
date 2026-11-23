@@ -92,7 +92,8 @@ private val EN = mapOf(
     "La app no recopila datos personales. Todo se guarda en tu dispositivo." to "The app collects no personal data. Everything is stored on your device.",
     "Datos borrados" to "Data cleared", "Los ajustes volvieron a sus valores iniciales." to "Settings were reset to their defaults.",
     "BORRAR DATOS RECOPILADOS" to "CLEAR COLLECTED DATA", "CERRAR" to "CLOSE", "Intensidad del glitch" to "Glitch intensity",
-    "Derechos de autor" to "Copyright", "Equipo de desarrollo" to "Development team",
+    "Derechos de autor" to "Copyright", "Cuenta" to "Account", "Tema claro" to "Light theme",
+    "Papel clínico y carmesí de Vitalis. Los colores salen de las paletas del juego." to "Vitalis clinical paper and crimson. Colors come from the game palettes.", "Equipo de desarrollo" to "Development team",
     // Pantalla de carga
     "CONECTANDO CON THE MOTHER…" to "CONNECTING TO THE MOTHER…",
     "RECUPERANDO REGISTROS DE VITALIS…" to "RECOVERING VITALIS RECORDS…",

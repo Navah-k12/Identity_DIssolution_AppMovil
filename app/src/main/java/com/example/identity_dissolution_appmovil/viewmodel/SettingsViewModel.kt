@@ -32,5 +32,6 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     }
     fun setGlitchIntensity(v: Float) = save { setGlitchIntensity(v) }
     fun setTextSize(v: Int) = save { setTextSize(v) }
+    fun setLightTheme(v: Boolean) = save { setLightTheme(v) }
     fun reset() = save { clear() }
 }

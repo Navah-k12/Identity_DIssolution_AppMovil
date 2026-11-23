@@ -29,6 +29,7 @@ class SettingsRepository(context: Context) {
         val PULSE = booleanPreferencesKey("pulse_notifications")
         val INTENSITY = floatPreferencesKey("glitch_intensity")
         val TEXT_SIZE = intPreferencesKey("text_size")
+        val LIGHT = booleanPreferencesKey("light_theme")
     }
 
     val settings: Flow<Settings> = store.data.map { p ->
@@ -41,6 +42,7 @@ class SettingsRepository(context: Context) {
             pulseNotifications = p[Keys.PULSE] ?: d.pulseNotifications,
             glitchIntensity = p[Keys.INTENSITY] ?: d.glitchIntensity,
             textSize = p[Keys.TEXT_SIZE] ?: d.textSize,
+            lightTheme = p[Keys.LIGHT] ?: d.lightTheme,
         )
     }
 
@@ -51,5 +53,6 @@ class SettingsRepository(context: Context) {
     suspend fun setPulse(v: Boolean) = store.edit { it[Keys.PULSE] = v }
     suspend fun setGlitchIntensity(v: Float) = store.edit { it[Keys.INTENSITY] = v }
     suspend fun setTextSize(v: Int) = store.edit { it[Keys.TEXT_SIZE] = v }
+    suspend fun setLightTheme(v: Boolean) = store.edit { it[Keys.LIGHT] = v }
     suspend fun clear() = store.edit { it.clear() }
 }
