@@ -20,6 +20,7 @@ object Routes {
     const val INVENTORY = "inventory"
     const val HISTORY = "history"
     const val SETTINGS = "settings"
+    const val REVIEWS = "reviews"
 
     fun article(id: Int) = "article/$id"
     fun model3d(id: Int) = "model3d/$id"

@@ -1,5 +1,6 @@
 package com.example.identity_dissolution_appmovil.ui.navigation
 
+import com.example.identity_dissolution_appmovil.ui.screens.ReviewsScreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
@@ -184,9 +185,15 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 ARScreen(onBack = { navController.safePopBackStack() })
             }
             composable(Routes.CONTROLS) { ControlsScreen(onBack = { navController.safePopBackStack() }) }
+            composable(Routes.REVIEWS) {
+                ReviewsScreen(
+                    onBack = { navController.safePopBackStack() },
+                    onLogin = { navController.navigateToTab(Routes.SETTINGS) },
+                )
+            }
             composable(Routes.HISTORY) { HistoryScreen(onBack = { navController.safePopBackStack() }) }
             composable(Routes.INVENTORY) { InventoryScreen() }
-            composable(Routes.SETTINGS) { SettingsScreen() }
+            composable(Routes.SETTINGS) { SettingsScreen(onOpenReviews = { navController.navigate(Routes.REVIEWS) }) }
         }
     }
 }

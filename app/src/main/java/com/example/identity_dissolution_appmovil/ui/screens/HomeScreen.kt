@@ -1,7 +1,8 @@
 package com.example.identity_dissolution_appmovil.ui.screens
 
-import com.example.identity_dissolution_appmovil.ui.components.tr
+import androidx.compose.material.icons.outlined.StarOutline
 import com.example.identity_dissolution_appmovil.ui.components.t
+import com.example.identity_dissolution_appmovil.ui.components.tr
 import com.example.identity_dissolution_appmovil.ui.components.Lang
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
@@ -120,6 +121,7 @@ fun HomeContent(state: HomeUiState, onNavigate: (String) -> Unit) {
             QuickAccess(tr("Bestiario"), "Amenazas registradas", Icons.Outlined.Visibility, Routes.BESTIARY),
             QuickAccess(tr("Controles"), "Teclado y mando", Icons.Outlined.Keyboard, Routes.CONTROLS),
             QuickAccess(tr("Historia"), "Cronología del lore", Icons.Outlined.History, Routes.HISTORY),
+            QuickAccess(t("Comentarios", "Reviews"), t("Califica la app", "Rate the app"), Icons.Outlined.StarOutline, Routes.REVIEWS),
         )
     }
 

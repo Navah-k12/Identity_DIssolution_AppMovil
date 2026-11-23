@@ -92,12 +92,13 @@ import com.example.identity_dissolution_appmovil.viewmodel.SettingsViewModel
 private val BloodFont = FontFamily(Font(R.font.rubik_wet_paint))
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = viewModel(), authViewModel: AuthViewModel = viewModel()) {
+fun SettingsScreen(onOpenReviews: () -> Unit = {}, viewModel: SettingsViewModel = viewModel(), authViewModel: AuthViewModel = viewModel()) {
     val s by viewModel.state.collectAsState()
     val auth by authViewModel.state.collectAsState()
     SettingsContent(
         s = s,
         onLightTheme = viewModel::setLightTheme,
+        onOpenReviews = onOpenReviews,
         account = {
             val context = LocalContext.current
             AccountCard(auth, authViewModel::signIn, authViewModel::register, { authViewModel.signInWithGoogle(context) }, authViewModel::signOut, authViewModel::clearError)
@@ -119,6 +120,7 @@ fun SettingsContent(
     s: Settings,
     onGlitch: (Boolean) -> Unit = {},
     onLightTheme: (Boolean) -> Unit = {},
+    onOpenReviews: () -> Unit = {},
     account: @Composable () -> Unit = {},
     onRetro: (Boolean) -> Unit = {},
     onToggleLanguage: () -> Unit = {},
@@ -202,6 +204,8 @@ fun SettingsContent(
             Spacer(Modifier.height(16.dp))
             SectionLabel(tr("Información"))
             HorrorCard(Modifier.fillMaxWidth()) {
+                LinkRow(t("Comentarios y calificación", "Reviews & rating"), onClick = onOpenReviews)
+                Divider()
                 LinkRow(tr("Acerca de la app")) {
                     dialog = "Identity Dissolution" to t("Versión 1.0\nApp complementaria del videojuego de survival horror Identity Dissolution.", "Version 1.0\nCompanion app for the survival horror game Identity Dissolution.")
                 }
